@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Users, FileText, Calendar, TrendingUp, Brain, CheckSquare } from 'lucide-react'
+import { Users, FileText, Calendar, TrendingUp, Brain, CheckSquare, Briefcase } from 'lucide-react'
 import { dashboardAPI } from '@/lib/api'
 import KPICard from '@/components/features/KPICard'
 import PageHeader from '@/components/ui/PageHeader'

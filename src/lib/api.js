@@ -124,7 +124,7 @@ export const tasksAPI = {
 // DASHBOARD & ANALYTICS
 // ==================
 export const dashboardAPI = {
-  getSummary:  () => api.get('/dashboard/summary'),
+  getSummary:  () => api.get('/dashboard/'),
   getAnalytics:() => api.get('/analytics/overview'),
 }
 
