@@ -7,9 +7,15 @@ import toast from 'react-hot-toast'
 
 export default function Register() {
   const navigate = useNavigate()
-  const [form, setForm]       = useState({ full_name: '', email: '', password: '', confirm: '' })
+  const [form, setForm] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    confirm: '',
+    role: 'user',
+  });
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -17,7 +23,12 @@ export default function Register() {
     setLoading(true)
     setError('')
     try {
-      await authAPI.register({ full_name: form.full_name, email: form.email, password: form.password })
+      await authAPI.register({
+        full_name: form.full_name,
+        email: form.email,
+        password: form.password,
+        role: form.role,
+      });
       toast.success('Account created! Please sign in.')
       navigate('/login')
     } catch (err) {
@@ -33,7 +44,7 @@ export default function Register() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>
-          <svg viewBox="0 0 32 32" fill="none" width="40" height="40"><rect width="32" height="32" rx="8" fill="var(--color-primary)"/><path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="16" cy="10" r="2" fill="white"/><line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 32 32" fill="none" width="40" height="40"><rect width="32" height="32" rx="8" fill="var(--color-primary)" /><path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="16" cy="10" r="2" fill="white" /><line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" /></svg>
           <span className={styles.logoText}>SaarthiIQ</span>
         </div>
         <h1 className={styles.title}>Create account</h1>
@@ -55,6 +66,17 @@ export default function Register() {
           <div className="form-group">
             <label className="label">Confirm Password</label>
             <input className="input" type="password" placeholder="Repeat password" value={form.confirm} onChange={set('confirm')} required />
+          </div>
+          <div className="form-group">
+            <label className="label">Account Type</label>
+            <select
+              className="input"
+              value={form.role || 'user'}
+              onChange={set('role')}
+            >
+              <option value="user">Recrutee</option>
+              <option value="recruiter">Recruiter</option>
+            </select>
           </div>
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
             {loading ? <Spinner size={16} /> : 'Create Account'}

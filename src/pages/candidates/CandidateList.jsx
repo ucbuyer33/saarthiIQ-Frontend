@@ -12,18 +12,18 @@ import styles from './Candidates.module.css'
 export default function CandidateList() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
-  const [candidates, setCandidates]   = useState([])
-  const [loading, setLoading]         = useState(true)
-  const [search, setSearch]           = useState(params.get('q') || '')
-  const [statusFilter, setStatus]     = useState('')
+  const [candidates, setCandidates] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState(params.get('q') || '')
+  const [statusFilter, setStatus] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
       try {
         const res = await candidatesAPI.getAll({ search, status: statusFilter })
-        setCandidates(res.data)
-      } catch {}
+        setCandidates(res.data.results || [])
+      } catch { }
       finally { setLoading(false) }
     }
     const t = setTimeout(fetchData, 300)
