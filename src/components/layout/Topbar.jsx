@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, Sun, Moon, LogOut, User, ChevronDown } from 'lucide-react'
+import { Search, Bell, Sun, Moon, LogOut, User, ChevronDown, Menu } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { candidatesAPI } from '@/lib/api'
 import { useDebounce } from '@/hooks/useDebounce'
 import styles from './Topbar.module.css'
 
-export default function Topbar() {
+export default function Topbar({ onToggleSidebarMobile }) {
   const { user, logout, role } = useAuth()
   const { theme, toggle }       = useTheme()
   const navigate                = useNavigate()
@@ -21,6 +21,15 @@ export default function Topbar() {
 
   return (
     <header className={styles.topbar}>
+      {/* Mobile menu button */}
+      <button
+        className={styles.menuBtn}
+        onClick={onToggleSidebarMobile}
+        aria-label="Toggle navigation"
+      >
+        <Menu size={18} />
+      </button>
+
       {/* Search */}
       <div className={styles.search}>
         <Search size={16} className={styles.searchIcon} />
