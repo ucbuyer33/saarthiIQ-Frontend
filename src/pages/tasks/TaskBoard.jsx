@@ -8,6 +8,7 @@ import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 export default function TaskBoard() {
   const { user, role } = useAuth()
@@ -16,6 +17,10 @@ export default function TaskBoard() {
   const [creating, setCreating] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [deletingId, setDeletingId] = useState(null)
+  
+  // --- Dialog State ---
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(null)
   
   const [form, setForm] = useState({
     title: '',
@@ -99,15 +104,22 @@ export default function TaskBoard() {
     }
   }
 
-  const handleDelete = async (id) => {
-    const confirmed = window.confirm('Delete this task?')
-    if (!confirmed) return
+  // --- Dialog Handlers ---
+  const askDelete = (task) => {
+    setSelectedTask(task)
+    setConfirmOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!selectedTask) return
 
     try {
-      setDeletingId(id)
-      await tasksAPI.delete(id)
-      setTasks((prev) => prev.filter((t) => t.id !== id))
+      setDeletingId(selectedTask.id)
+      await tasksAPI.delete(selectedTask.id)
+      setTasks((prev) => prev.filter((t) => t.id !== selectedTask.id))
       toast.success('Task deleted')
+      setConfirmOpen(false)
+      setSelectedTask(null)
     } catch (err) {
       console.error(err)
       toast.error(err.response?.data?.detail || 'Failed to delete task')
@@ -185,7 +197,7 @@ export default function TaskBoard() {
                 <button
                   type="button"
                   className="btn btn-ghost btn-icon"
-                  onClick={() => handleDelete(t.id)}
+                  onClick={() => askDelete(t)}
                   disabled={deletingId === t.id}
                   title="Delete task"
                   aria-label="Delete task"
@@ -229,15 +241,36 @@ export default function TaskBoard() {
 
           <div className="form-group">
             <label className="label">Priority</label>
-            <select className="input" value={form.priority} onChange={set('priority')}>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
+            <select className="select" value={form.priority} onChange={set('priority')}>
               <option value="High">High</option>
-              <option value="Urgent">Urgent</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
             </select>
           </div>
         </div>
       </Modal>
+
+      {/* Confirm Dialog Component */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete task?"
+        message={
+          selectedTask
+            ? `This will permanently delete "${selectedTask.title}".`
+            : 'This action cannot be undone.'
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmTone="danger"
+        loading={deletingId === selectedTask?.id}
+        onConfirm={handleDelete}
+        onClose={() => {
+          if (!deletingId) {
+            setConfirmOpen(false)
+            setSelectedTask(null)
+          }
+        }}
+      />
     </div>
   )
 }

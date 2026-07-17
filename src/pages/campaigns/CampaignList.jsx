@@ -8,12 +8,18 @@ import PageHeader from '@/components/ui/PageHeader'
 import EmptyState from '@/components/ui/EmptyState'
 import Spinner from '@/components/ui/Spinner'
 import Badge from '@/components/ui/Badge'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 export default function CampaignList() {
   const navigate = useNavigate()
   const { role } = useAuth()
   const [campaigns, setCampaigns] = useState([])
   const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState(null)
+
+  // --- Dialog State ---
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [selectedCampaign, setSelectedCampaign] = useState(null)
 
   useEffect(() => {
     campaignsAPI
@@ -26,17 +32,27 @@ export default function CampaignList() {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleDelete = async (id) => {
-    const confirmed = window.confirm('Delete this campaign?')
-    if (!confirmed) return
+  // --- Dialog Handlers ---
+  const askDelete = (campaign) => {
+    setSelectedCampaign(campaign)
+    setConfirmOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!selectedCampaign) return
 
     try {
-      await campaignsAPI.delete(id)
-      setCampaigns(prev => prev.filter(c => c.id !== id))
+      setDeletingId(selectedCampaign.id)
+      await campaignsAPI.delete(selectedCampaign.id)
+      setCampaigns((prev) => prev.filter((c) => c.id !== selectedCampaign.id))
       toast.success('Campaign deleted')
+      setConfirmOpen(false)
+      setSelectedCampaign(null)
     } catch (err) {
       console.error(err)
       toast.error(err.response?.data?.detail || 'Failed to delete campaign')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -115,7 +131,8 @@ export default function CampaignList() {
                 <button
                   type="button"
                   className="btn btn-ghost"
-                  onClick={() => handleDelete(c.id)}
+                  onClick={() => askDelete(c)}
+                  disabled={deletingId === c.id}
                   style={{ color: 'var(--color-error)', marginTop: 'var(--space-3)' }}
                   aria-label="Delete campaign"
                   title="Delete campaign"
@@ -127,6 +144,28 @@ export default function CampaignList() {
           ))}
         </div>
       )}
+
+      {/* Confirm Dialog Component */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete campaign?"
+        message={
+          selectedCampaign
+            ? `This will permanently delete "${selectedCampaign.campaign_name}".`
+            : 'This action cannot be undone.'
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmTone="danger"
+        loading={deletingId === selectedCampaign?.id}
+        onConfirm={handleDelete}
+        onClose={() => {
+          if (!deletingId) {
+            setConfirmOpen(false)
+            setSelectedCampaign(null)
+          }
+        }}
+      />
     </div>
   )
 }
