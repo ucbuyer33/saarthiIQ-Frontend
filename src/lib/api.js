@@ -1,3 +1,4 @@
+// saarthiIQ-Frontend\src\lib\api.js
 import axios from 'axios'
 import { getToken, clearToken } from './auth'
 import { API_BASE_URL } from './constants'
@@ -47,10 +48,13 @@ export const authAPI = {
 // ==================
 export const usersAPI = {
   getMe: () => api.get('/users/me'),
-  update: (data) => api.put('/users/me', data),
+  update: (data) => api.patch('/users/me', data),
   getAll: () => api.get('/users'),
   getById: (id) => api.get(`/users/${id}`),
   delete: (id) => api.delete(`/users/${id}`),
+  changePassword: (data) => api.post('/auth/change-password', data),
+  logoutEverywhere: () => api.post('/auth/logout-everywhere'),
+  deleteMe: () => api.delete('/auth/me'),
 }
 
 // ==================

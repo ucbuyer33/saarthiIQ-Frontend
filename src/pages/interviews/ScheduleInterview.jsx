@@ -93,7 +93,7 @@ export default function ScheduleInterview() {
               minLength={2}
               value={form.interviewer_name}
               onChange={set('interviewer_name')}
-              placeholder="e.g. Shajaf Khan"
+              placeholder="e.g. John Doe"
             />
           </div>
 

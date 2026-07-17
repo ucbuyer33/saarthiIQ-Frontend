@@ -53,11 +53,11 @@ export default function Register() {
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className="form-group">
             <label className="label">Full Name</label>
-            <input className="input" type="text" placeholder="Shajaf Khan" value={form.full_name} onChange={set('full_name')} required />
+            <input className="input" type="text" placeholder="John Doe" value={form.full_name} onChange={set('full_name')} required />
           </div>
           <div className="form-group">
             <label className="label">Email</label>
-            <input className="input" type="email" placeholder="you@company.com" value={form.email} onChange={set('email')} required />
+            <input className="input" type="email" placeholder="abc@company.com" value={form.email} onChange={set('email')} required />
           </div>
           <div className="form-group">
             <label className="label">Password</label>
