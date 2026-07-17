@@ -95,9 +95,9 @@ export const aiAPI = {
 // INTERVIEW ENDPOINTS
 // ==================
 export const interviewsAPI = {
-  getAll: (params) => api.get('/interviews', { params }),
-  getById: (id) => api.get(`/interviews/${id}`),
-  create: (data) => api.post('/interviews', data),
+  getAll: () => api.get('/interviews'),
+  getByCandidate: (candidateId) => api.get(`/interviews/${candidateId}`),
+  create: (candidateId, data) => api.post(`/interviews/${candidateId}`, data),
   update: (id, data) => api.put(`/interviews/${id}`, data),
   delete: (id) => api.delete(`/interviews/${id}`),
 }
@@ -128,7 +128,7 @@ export const tasksAPI = {
 // ==================
 export const dashboardAPI = {
   getSummary: () => api.get('/dashboard/'),
-  getAnalytics: () => api.get('/analytics/overview'),
+  getAnalytics: () => api.get('/analytics/dashboard'),
 }
 
 // ==================
