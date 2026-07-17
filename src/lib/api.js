@@ -38,108 +38,111 @@ export default api
 // AUTH ENDPOINTS
 // ==================
 export const authAPI = {
-  login:    (data)   => api.post('/auth/login', new URLSearchParams(data), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }),
-  register: (data)   => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', new URLSearchParams(data), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }),
+  register: (data) => api.post('/auth/register', data),
 }
 
 // ==================
 // USER ENDPOINTS
 // ==================
 export const usersAPI = {
-  getMe:   ()     => api.get('/users/me'),
-  update:  (data) => api.put('/users/me', data),
-  getAll:  ()     => api.get('/users'),
-  getById: (id)   => api.get(`/users/${id}`),
-  delete:  (id)   => api.delete(`/users/${id}`),
+  getMe: () => api.get('/users/me'),
+  update: (data) => api.put('/users/me', data),
+  getAll: () => api.get('/users'),
+  getById: (id) => api.get(`/users/${id}`),
+  delete: (id) => api.delete(`/users/${id}`),
 }
 
 // ==================
 // CANDIDATE ENDPOINTS
 // ==================
 export const candidatesAPI = {
-  getAll:    (params) => api.get('/candidates', { params }),
-  getById:   (id)     => api.get(`/candidates/${id}`),
-  create:    (data)   => api.post('/candidates', data),
-  update:    (id, data) => api.put(`/candidates/${id}`, data),
-  delete:    (id)     => api.delete(`/candidates/${id}`),
-  search:    (q)      => api.get('/search', { params: { q } }),
+  getAll: (params) => api.get('/candidates', { params }),
+  getById: (id) => api.get(`/candidates/${id}`),
+  create: (data) => api.post('/candidates', data),
+  update: (id, data) => api.put(`/candidates/${id}`, data),
+  delete: (id) => api.delete(`/candidates/${id}`),
+  search: (q) => api.get('/search', { params: { q } }),
 }
 
 // ==================
 // RESUME ENDPOINTS
 // ==================
 export const resumeAPI = {
-  upload:     (candidateId, file) => {
+  upload: (candidateId, file) => {
     const form = new FormData()
     form.append('file', file)
-    return api.post(`/resume/upload/${candidateId}`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+    return api.post(`/resume/upload/${candidateId}`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
   },
-  getAll:     (candidateId) => api.get(`/resume/${candidateId}`),
-  parse:      (resumeId)    => api.post(`/parser/parse/${resumeId}`),
-  score:      (resumeId)    => api.post(`/resume-score/score/${resumeId}`),
-  jobMatch:   (data)        => api.post('/job-match/match', data),
+  getByCandidate: (candidateId) => api.get(`/resume/${candidateId}`),
+  download: (resumeId) => api.get(`/resume/download/${resumeId}`),
+  parse: (resumeId) => api.post(`/parser/parse/${resumeId}`),
+  score: (resumeId) => api.post(`/resume-score/${resumeId}`),
+  jobMatch: (data) => api.post('/job-match/match', data),
 }
 
 // ==================
 // AI ENDPOINTS
 // ==================
 export const aiAPI = {
-  skillGap:   (candidateId) => api.post(`/skill-gap/analyze/${candidateId}`),
-  aiReport:   (candidateId) => api.post(`/ai-report/generate/${candidateId}`),
+  skillGap: (resumeId) => api.post(`/skill-gap/${resumeId}`),
+  aiReport: (resumeId) => api.post(`/ai-report/${resumeId}`),
 }
 
 // ==================
 // INTERVIEW ENDPOINTS
 // ==================
 export const interviewsAPI = {
-  getAll:    (params) => api.get('/interviews', { params }),
-  getById:   (id)     => api.get(`/interviews/${id}`),
-  create:    (data)   => api.post('/interviews', data),
-  update:    (id, data) => api.put(`/interviews/${id}`, data),
-  delete:    (id)     => api.delete(`/interviews/${id}`),
+  getAll: (params) => api.get('/interviews', { params }),
+  getById: (id) => api.get(`/interviews/${id}`),
+  create: (data) => api.post('/interviews', data),
+  update: (id, data) => api.put(`/interviews/${id}`, data),
+  delete: (id) => api.delete(`/interviews/${id}`),
 }
 
 // ==================
 // CAMPAIGN ENDPOINTS
 // ==================
 export const campaignsAPI = {
-  getAll:  (params) => api.get('/campaigns', { params }),
-  getById: (id)     => api.get(`/campaigns/${id}`),
-  create:  (data)   => api.post('/campaigns', data),
-  update:  (id, data) => api.put(`/campaigns/${id}`, data),
-  delete:  (id)     => api.delete(`/campaigns/${id}`),
+  getAll: (params) => api.get('/campaigns', { params }),
+  getById: (id) => api.get(`/campaigns/${id}`),
+  create: (data) => api.post('/campaigns', data),
+  update: (id, data) => api.put(`/campaigns/${id}`, data),
+  delete: (id) => api.delete(`/campaigns/${id}`),
 }
 
 // ==================
 // TASK ENDPOINTS
 // ==================
 export const tasksAPI = {
-  getAll:  (params) => api.get('/tasks', { params }),
-  create:  (data)   => api.post('/tasks', data),
-  update:  (id, data) => api.put(`/tasks/${id}`, data),
-  delete:  (id)     => api.delete(`/tasks/${id}`),
+  getAll: (params) => api.get('/tasks', { params }),
+  create: (data) => api.post('/tasks', data),
+  update: (id, data) => api.put(`/tasks/${id}`, data),
+  delete: (id) => api.delete(`/tasks/${id}`),
 }
 
 // ==================
 // DASHBOARD & ANALYTICS
 // ==================
 export const dashboardAPI = {
-  getSummary:  () => api.get('/dashboard/'),
-  getAnalytics:() => api.get('/analytics/overview'),
+  getSummary: () => api.get('/dashboard/'),
+  getAnalytics: () => api.get('/analytics/overview'),
 }
 
 // ==================
 // NOTES ENDPOINTS
 // ==================
 export const notesAPI = {
-  getAll:  (candidateId) => api.get(`/notes/${candidateId}`),
-  create:  (data)        => api.post('/notes', data),
-  delete:  (id)          => api.delete(`/notes/${id}`),
+  getAll: (candidateId) => api.get(`/notes/${candidateId}`),
+  create: (candidateId, data) => api.post(`/notes/${candidateId}`, data),
+  delete: (id) => api.delete(`/notes/${id}`),
 }
 
 // ==================
 // AUDIT ENDPOINTS
 // ==================
 export const auditAPI = {
-  getAll:  (params) => api.get('/audit', { params }),
+  getAll: (params) => api.get('/audit', { params }),
 }

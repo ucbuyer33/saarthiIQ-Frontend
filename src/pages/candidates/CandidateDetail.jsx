@@ -13,12 +13,12 @@ import styles from './CandidateDetail.module.css'
 export default function CandidateDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [candidate, setCandidate]   = useState(null)
-  const [loading, setLoading]       = useState(true)
+  const [candidate, setCandidate] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [deleting, setDeleting]     = useState(false)
-  const [note, setNote]             = useState('')
-  const [notes, setNotes]           = useState([])
+  const [deleting, setDeleting] = useState(false)
+  const [note, setNote] = useState('')
+  const [notes, setNotes] = useState([])
 
   useEffect(() => {
     Promise.all([
@@ -27,7 +27,7 @@ export default function CandidateDetail() {
     ]).then(([cRes, nRes]) => {
       setCandidate(cRes.data)
       setNotes(nRes.data || [])
-    }).catch(() => {}).finally(() => setLoading(false))
+    }).catch(() => { }).finally(() => setLoading(false))
   }, [id])
 
   const handleDelete = async () => {
@@ -43,7 +43,7 @@ export default function CandidateDetail() {
     e.preventDefault()
     if (!note.trim()) return
     try {
-      const res = await notesAPI.create({ candidate_id: id, content: note })
+      const res = await notesAPI.create(id, { note })
       setNotes(n => [res.data, ...n])
       setNote('')
     } catch { toast.error('Failed to add note') }
@@ -83,7 +83,7 @@ export default function CandidateDetail() {
             </div>
             <div className="divider" />
             <dl className={styles.details}>
-              {candidate.phone    && <><dt>Phone</dt><dd>{candidate.phone}</dd></>}
+              {candidate.phone && <><dt>Phone</dt><dd>{candidate.phone}</dd></>}
               {candidate.location && <><dt>Location</dt><dd>{candidate.location}</dd></>}
               {candidate.experience && <><dt>Experience</dt><dd>{candidate.experience}</dd></>}
             </dl>
@@ -122,11 +122,11 @@ export default function CandidateDetail() {
             {notes.length === 0
               ? <p className="text-muted text-sm">No notes yet.</p>
               : notes.map(n => (
-                  <div key={n.id} style={{ padding: 'var(--space-3)', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <p>{n.content}</p>
-                    <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)', marginTop: 'var(--space-1)' }}>{new Date(n.created_at).toLocaleDateString()}</p>
-                  </div>
-                ))
+                <div key={n.id} style={{ padding: 'var(--space-3)', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
+                  <p>{n.note}</p>
+                  <p style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-xs)', marginTop: 'var(--space-1)' }}>{new Date(n.created_at).toLocaleDateString()}</p>
+                </div>
+              ))
             }
           </div>
         </div>

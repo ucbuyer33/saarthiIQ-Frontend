@@ -9,16 +9,20 @@ import toast from 'react-hot-toast'
 export default function AIReport() {
   const [params] = useSearchParams()
   const [candidateId, setCandidateId] = useState(params.get('candidate') || '')
-  const [report, setReport]   = useState(null)
+  const [report, setReport] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const generate = async (e) => {
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await aiAPI.aiReport(candidateId)
+      const res = await aiAPI.aiReport(latestResume.id)
       setReport(res.data)
-    } catch { toast.error('Report generation failed') } finally { setLoading(false) }
+    } catch (error) {
+      toast.error('Report generation failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

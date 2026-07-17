@@ -8,16 +8,20 @@ import toast from 'react-hot-toast'
 export default function SkillGap() {
   const [params] = useSearchParams()
   const [candidateId, setCandidateId] = useState(params.get('candidate') || '')
-  const [result, setResult]     = useState(null)
-  const [loading, setLoading]   = useState(false)
+  const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const analyze = async (e) => {
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await aiAPI.skillGap(candidateId)
+      const res = await aiAPI.skillGap(latestResume.id)
       setResult(res.data)
-    } catch { toast.error('Analysis failed') } finally { setLoading(false) }
+    } catch (error) {
+      toast.error('Analysis failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

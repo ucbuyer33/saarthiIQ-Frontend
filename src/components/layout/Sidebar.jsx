@@ -1,3 +1,4 @@
+// src/components/layout/Sidebar.jsx
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, FileText, TrendingUp, Brain,
@@ -11,34 +12,39 @@ import styles from './Sidebar.module.css'
 const ICONS = {
   LayoutDashboard, Users, FileText, TrendingUp, Brain,
   Calendar, Megaphone, CheckSquare, BarChart2,
-  UserCog, Shield, Settings
+  UserCog, Shield, Settings,
 }
 
 export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobile }) {
   const { role } = useAuth()
-
   const visibleItems = NAV_ITEMS.filter(item => item.roles.includes(role))
+
+  const handleLogoClick = () => {
+    if (window.innerWidth > 768) onCollapse?.()
+  }
+
+  const handleNavClick = () => {
+    if (window.innerWidth <= 768) onCloseMobile?.()
+  }
 
   return (
     <aside
       className={styles.sidebar}
       data-collapsed={collapsed}
       data-mobile-open={mobileOpen}
-      onClick={onCloseMobile}        // click backdrop to close on mobile
+      onClick={onCloseMobile}
     >
       <div className={styles.inner} onClick={e => e.stopPropagation()}>
-        {/* Logo */}
-        <div className={styles.logo}>
+        <button className={styles.logo} onClick={handleLogoClick} aria-label="Toggle sidebar">
           <svg viewBox="0 0 32 32" fill="none" className={styles.logoIcon}>
-            <rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
-            <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="16" cy="10" r="2" fill="white"/>
-            <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+            <rect width="32" height="32" rx="8" fill="var(--color-primary)" />
+            <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="16" cy="10" r="2" fill="white" />
+            <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
           {!collapsed && <span className={styles.logoText}>SaarthiIQ</span>}
-        </div>
+        </button>
 
-        {/* Nav items */}
         <nav className={styles.nav}>
           {visibleItems.map(item => {
             const Icon = ICONS[item.icon]
@@ -46,9 +52,8 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
               <NavLink
                 key={item.path}
                 to={item.path}
-                className={({ isActive }) =>
-                  `${styles.navItem} ${isActive ? styles.active : ''}`
-                }
+                onClick={handleNavClick}
+                className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
                 title={collapsed ? item.label : undefined}
               >
                 {Icon && <Icon size={18} />}
@@ -58,12 +63,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
           })}
         </nav>
 
-        {/* Collapse toggle (desktop only, hidden on mobile via CSS) */}
-        <button
-          className={styles.collapseBtn}
-          onClick={onCollapse}
-          aria-label="Toggle sidebar"
-        >
+        <button className={styles.collapseBtn} onClick={onCollapse} aria-label="Toggle sidebar">
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
