@@ -9,11 +9,11 @@ import styles from './Auth.module.css'
 
 export default function Login() {
   const { login } = useAuth()
-  const navigate  = useNavigate()
-  const [form, setForm]       = useState({ username: '', password: '' })
-  const [showPw, setShowPw]   = useState(false)
+  const navigate = useNavigate()
+  const [form, setForm] = useState({ username: '', password: '' })
+  const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -21,8 +21,13 @@ export default function Login() {
     setError('')
     try {
       const res = await authAPI.login({ username: form.username, password: form.password })
-      await login(res.data.access_token)
-      navigate('/dashboard')
+      const role = await login(res.data.access_token)
+
+      if (role === 'admin') {
+        navigate('/admin/users')
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid credentials')
     } finally {
@@ -36,10 +41,10 @@ export default function Login() {
         {/* Logo */}
         <div className={styles.logo}>
           <svg viewBox="0 0 32 32" fill="none" width="40" height="40">
-            <rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
-            <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="16" cy="10" r="2" fill="white"/>
-            <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+            <rect width="32" height="32" rx="8" fill="var(--color-primary)" />
+            <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="16" cy="10" r="2" fill="white" />
+            <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
           <span className={styles.logoText}>SaarthiIQ</span>
         </div>

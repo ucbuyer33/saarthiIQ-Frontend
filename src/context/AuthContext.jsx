@@ -24,10 +24,15 @@ export function AuthProvider({ children }) {
       const res = await usersAPI.getMe()
       const data = res.data?.data || res.data
       setUser(data)
+
       const decoded = decodeToken(tkn)
-      setRole(data?.role || decoded?.role || 'user')
+      const resolvedRole = data?.role || decoded?.role || 'user'
+      setRole(resolvedRole)
+
+      return resolvedRole
     } catch {
       logout()
+      return null
     } finally {
       setLoading(false)
     }
@@ -47,7 +52,8 @@ export function AuthProvider({ children }) {
   const login = async (tokenStr) => {
     saveToken(tokenStr)
     setToken(tokenStr)
-    await loadUser(tokenStr)
+    const resolvedRole = await loadUser(tokenStr)
+    return resolvedRole
   }
 
   const hasRole = (...roles) => roles.includes(role)

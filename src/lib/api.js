@@ -47,8 +47,8 @@ export const authAPI = {
 // USER ENDPOINTS
 // ==================
 export const usersAPI = {
-  getMe: () => api.get('/users/me'),
-  update: (data) => api.patch('/users/me', data),
+  getMe: () => api.get('/auth/me'),
+  update: (data) => api.patch('/auth/me', data),
   getAll: () => api.get('/users'),
   getById: (id) => api.get(`/users/${id}`),
   delete: (id) => api.delete(`/users/${id}`),
