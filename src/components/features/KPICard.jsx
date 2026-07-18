@@ -1,3 +1,4 @@
+// src\components\features\KPICard.jsx
 import styles from './KPICard.module.css'
 
 export default function KPICard({ title, value, icon: Icon, color = 'primary', trend, trendLabel }) {
