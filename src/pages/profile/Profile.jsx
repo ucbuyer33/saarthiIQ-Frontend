@@ -197,7 +197,7 @@ function SessionsPanel() {
     setLoading(true)
     try {
       const res = await sessionsAPI.getAll()
-      setSessions(res.data?.data || res.data || [])
+      setSessions(res.data?.data || res.data?.results || res.data || [])
     } catch { setSessions([]) }
     finally { setLoading(false) }
   }, [])
