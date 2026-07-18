@@ -5,17 +5,38 @@ import {
   CalendarClock, Megaphone, Users, Activity, Settings,
   Shield, Edit3, Save, Globe, Bell, Palette, AtSign,
   ChevronRight, Lock, Monitor, LogOut, Trash2, Eye, EyeOff,
+  Laptop, Smartphone, Check, X,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { usersAPI, auditAPI } from '@/lib/api'
+import { usersAPI, auditAPI, sessionsAPI } from '@/lib/api'
 import Avatar from '@/components/ui/Avatar'
 import Spinner from '@/components/ui/Spinner'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import toast from 'react-hot-toast'
 import styles from './Profile.module.css'
 
-// ─── Stat meta ───────────────────────────────────────────────────────────────
+// ─── Password strength (mirrors Register page) ────────────────────────────────
+const PW_RULES = [
+  { key: 'len',     label: 'At least 8 characters',     test: p => p.length >= 8 },
+  { key: 'upper',   label: 'Contains uppercase letter',  test: p => /[A-Z]/.test(p) },
+  { key: 'lower',   label: 'Contains lowercase letter',  test: p => /[a-z]/.test(p) },
+  { key: 'number',  label: 'Contains a number',          test: p => /[0-9]/.test(p) },
+  { key: 'special', label: 'Contains special character', test: p => /[^A-Za-z0-9]/.test(p) },
+]
+const STRENGTH_META = [
+  { label: 'Very Weak', color: '#ef4444', pct: '20%'  },
+  { label: 'Weak',      color: '#ef4444', pct: '20%'  },
+  { label: 'Fair',      color: '#f59e0b', pct: '50%'  },
+  { label: 'Good',      color: '#4db6bc', pct: '75%'  },
+  { label: 'Strong',    color: '#4ade80', pct: '100%' },
+]
+function getStrength(pw) {
+  if (!pw) return -1
+  return PW_RULES.filter(r => r.test(pw)).length - 1
+}
+
+// ─── Stat meta ────────────────────────────────────────────────────────────────
 const STAT_META = {
   Email:                 { icon: Mail,          gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
   Phone:                 { icon: Phone,         gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
@@ -70,11 +91,16 @@ function Field({ label, value, icon: Icon }) {
   )
 }
 
-// ─── Password field with show/hide ───────────────────────────────────────────
-function PwdInput({ label, name, value, onChange, required, placeholder }) {
-  const [show, setShow] = useState(false)
+// ─── Password input with show/hide + optional strength meter ─────────────────
+function PwdInput({ label, name, value, onChange, required, placeholder, showStrength = false }) {
+  const [show, setShow]     = useState(false)
+  const [focused, setFocused] = useState(false)
+  const strengthIdx = showStrength ? getStrength(value) : -1
+  const sm = strengthIdx >= 0 ? STRENGTH_META[strengthIdx] : null
+  const showPanel = showStrength && (value || focused)
+
   return (
-    <div className={styles.editField}>
+    <div className={styles.editField} style={{ gridColumn: showStrength ? '1 / -1' : undefined }}>
       <label className={styles.editLabel}>{label}{required && <span className={styles.req}> *</span>}</label>
       <div className={styles.editInputWrap}>
         <Lock size={13} className={styles.editInputIcon} />
@@ -87,11 +113,40 @@ function PwdInput({ label, name, value, onChange, required, placeholder }) {
           required={required}
           placeholder={placeholder || label}
           autoComplete="new-password"
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
         />
         <button type="button" className={styles.pwdToggle} onClick={() => setShow(s => !s)} tabIndex={-1}>
           {show ? <EyeOff size={13} /> : <Eye size={13} />}
         </button>
       </div>
+
+      {showPanel && (
+        <div className={styles.strengthPanel}>
+          <div className={styles.strengthBarTrack}>
+            <div
+              className={styles.strengthBarFill}
+              style={{ width: sm ? sm.pct : '0%', background: sm ? sm.color : '#ef4444' }}
+            />
+          </div>
+          {sm && (
+            <p className={styles.strengthText}>
+              Password strength: <strong style={{ color: sm.color }}>{sm.label}</strong>
+            </p>
+          )}
+          <ul className={styles.pwRuleList}>
+            {PW_RULES.map(rule => {
+              const passed = value && rule.test(value)
+              return (
+                <li key={rule.key} className={`${styles.pwRule} ${passed ? styles.pwRulePassed : ''}`}>
+                  <span className={styles.pwRuleIcon}><Check size={10} strokeWidth={3} /></span>
+                  {rule.label}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
@@ -107,8 +162,128 @@ function ActivityRow({ event }) {
         {event.detail && <p className={styles.activityDetail}>{event.detail}</p>}
       </div>
       <span className={styles.activityTime}>
-        {ts ? new Date(ts).toLocaleString(undefined, { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '\u2014'}
+        {ts ? new Date(ts).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '\u2014'}
       </span>
+    </div>
+  )
+}
+
+// ─── Session row ──────────────────────────────────────────────────────────────
+function SessionRow({ session, onRevoke, revoking }) {
+  const isMobile = /mobile|android|iphone|ipad/i.test(session.user_agent || '')
+  const DeviceIcon = isMobile ? Smartphone : Laptop
+  const ts = session.created_at || session.last_active
+  const isCurrent = session.is_current
+
+  return (
+    <div className={`${styles.sessionRow} ${isCurrent ? styles.sessionRowCurrent : ''}`}>
+      <div className={styles.sessionLeft}>
+        <div className={styles.sessionDeviceIcon}>
+          <DeviceIcon size={16} />
+        </div>
+        <div>
+          <p className={styles.sessionDevice}>
+            {session.device_name || (isMobile ? 'Mobile Device' : 'Desktop Browser')}
+            {isCurrent && <span className={styles.sessionCurrentBadge}>Current</span>}
+          </p>
+          <p className={styles.sessionMeta}>
+            {session.ip_address && <span>{session.ip_address}</span>}
+            {session.location  && <span> &middot; {session.location}</span>}
+            {ts && <span> &middot; {new Date(ts).toLocaleDateString()}</span>}
+          </p>
+          {session.user_agent && (
+            <p className={styles.sessionUA}>{session.user_agent.slice(0, 80)}{session.user_agent.length > 80 ? '\u2026' : ''}</p>
+          )}
+        </div>
+      </div>
+      {!isCurrent && (
+        <button
+          type="button"
+          className={styles.sessionRevokeBtn}
+          onClick={() => onRevoke(session.id)}
+          disabled={revoking === session.id}
+          title="Revoke session"
+        >
+          {revoking === session.id ? <Spinner size={12} /> : <X size={14} />}
+        </button>
+      )}
+    </div>
+  )
+}
+
+// ─── Active Sessions panel ────────────────────────────────────────────────────
+function SessionsPanel() {
+  const [sessions, setSessions] = useState([])
+  const [loading, setLoading]   = useState(true)
+  const [revoking, setRevoking] = useState(null)
+  const { logout } = useAuth()
+  const navigate   = useNavigate()
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await sessionsAPI.getAll()
+      setSessions(res.data?.data || res.data || [])
+    } catch {
+      // Backend may not have this endpoint yet — show graceful fallback
+      setSessions([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const handleRevoke = async (id) => {
+    setRevoking(id)
+    try {
+      await sessionsAPI.revoke(id)
+      toast.success('Session revoked')
+      setSessions(s => s.filter(x => x.id !== id))
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to revoke session')
+    } finally {
+      setRevoking(null)
+    }
+  }
+
+  const handleRevokeAll = async () => {
+    try {
+      await sessionsAPI.revokeAll()
+      toast.success('Logged out from all devices')
+      logout()
+      navigate('/login')
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to logout everywhere')
+    }
+  }
+
+  return (
+    <div className={styles.sessionsPanel}>
+      <div className={styles.sessionsPanelHeader}>
+        <p className={styles.sessionsPanelTitle}>
+          <Monitor size={13} /> Active Sessions
+        </p>
+        <button type="button" className={styles.revokeAllBtn} onClick={handleRevokeAll}>
+          <LogOut size={12} /> Logout All
+        </button>
+      </div>
+
+      {loading ? (
+        <div className={styles.sessionsLoading}><Spinner size={16} /></div>
+      ) : sessions.length === 0 ? (
+        <div className={styles.sessionsEmpty}>
+          <Monitor size={20} className={styles.sessionsEmptyIcon} />
+          <p>No active sessions found.</p>
+          <p className={styles.sessionsEmptyNote}>Session data may not be available on this server.</p>
+        </div>
+      ) : (
+        <div className={styles.sessionsList}>
+          {sessions.map((s, i) => (
+            <SessionRow key={s.id || i} session={s} onRevoke={handleRevoke} revoking={revoking} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -118,26 +293,24 @@ export default function Profile() {
   const navigate = useNavigate()
   const { user, setUser, role, logout } = useAuth()
 
-  // ── Edit profile state
-  const [form, setForm] = useState({ full_name:'', email:'', phone:'', location:'', timezone:'', language:'', theme:'', email_preferences:'' })
-  const [saving, setSaving]     = useState(false)
+  const [form, setForm]     = useState({ full_name:'', email:'', phone:'', location:'', timezone:'', language:'', theme:'', email_preferences:'' })
+  const [saving, setSaving] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
-  // ── Change password state
-  const [pwdOpen, setPwdOpen]   = useState(false)
-  const [pwdForm, setPwdForm]   = useState({ current_password:'', new_password:'', confirm_password:'' })
+  const [pwdOpen, setPwdOpen]     = useState(false)
+  const [pwdForm, setPwdForm]     = useState({ current_password:'', new_password:'', confirm_password:'' })
   const [pwdSaving, setPwdSaving] = useState(false)
+  const [pwdFocused, setPwdFocused] = useState(false)
 
-  // ── Security actions
-  const [logoutLoading, setLogoutLoading]   = useState(false)
-  const [deleteOpen, setDeleteOpen]         = useState(false)
-  const [deleteLoading, setDeleteLoading]   = useState(false)
+  const [sessionsOpen, setSessionsOpen] = useState(false)
 
-  // ── Activity feed
-  const [activity, setActivity]   = useState([])
+  const [logoutLoading, setLogoutLoading] = useState(false)
+  const [deleteOpen, setDeleteOpen]       = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+
+  const [activity, setActivity]     = useState([])
   const [actLoading, setActLoading] = useState(false)
 
-  // Populate form when user loads
   useEffect(() => {
     if (user) {
       setForm({
@@ -153,23 +326,17 @@ export default function Profile() {
     }
   }, [user])
 
-  // Load activity feed
   const loadActivity = useCallback(async () => {
     setActLoading(true)
     try {
       const res = await auditAPI.getAll({ limit: 10 })
-      const rows = res.data?.results || res.data || []
-      setActivity(rows)
-    } catch {
-      setActivity([])
-    } finally {
-      setActLoading(false)
-    }
+      setActivity(res.data?.results || res.data || [])
+    } catch { setActivity([]) }
+    finally { setActLoading(false) }
   }, [])
 
   useEffect(() => { loadActivity() }, [loadActivity])
 
-  // ── Stats
   const stats = useMemo(() => {
     const shared = [
       { label: 'Email',    value: user?.email },
@@ -185,18 +352,17 @@ export default function Profile() {
       { label: 'Last Activity',         value: user?.last_activity ? new Date(user.last_activity).toLocaleString() : '\u2014' },
     ]
     const admin = [
-      { label: 'Assigned Role',     value: role || user?.role },
-      { label: 'Permission Scope',  value: user?.permission_scope },
-      { label: 'Admin Privileges',  value: user?.admin_privileges },
-      { label: 'Users Managed',     value: user?.users_managed },
-      { label: 'Last Activity',     value: user?.last_activity ? new Date(user.last_activity).toLocaleString() : '\u2014' },
+      { label: 'Assigned Role',    value: role || user?.role },
+      { label: 'Permission Scope', value: user?.permission_scope },
+      { label: 'Admin Privileges', value: user?.admin_privileges },
+      { label: 'Users Managed',    value: user?.users_managed },
+      { label: 'Last Activity',    value: user?.last_activity ? new Date(user.last_activity).toLocaleString() : '\u2014' },
     ]
     return { shared, recruiter, admin }
   }, [user, role])
 
   const isAdmin = role === 'admin'
 
-  // ── Handlers
   const handleChange    = key => e => setForm(f => ({ ...f, [key]: e.target.value }))
   const handlePwdChange = e => setPwdForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
@@ -216,20 +382,12 @@ export default function Profile() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault()
-    if (pwdForm.new_password !== pwdForm.confirm_password) {
-      toast.error('New passwords do not match')
-      return
-    }
-    if (pwdForm.new_password.length < 6) {
-      toast.error('Password must be at least 6 characters')
-      return
-    }
+    if (pwdForm.new_password !== pwdForm.confirm_password) { toast.error('Passwords do not match'); return }
+    const strength = getStrength(pwdForm.new_password)
+    if (strength < 1) { toast.error('Password is too weak. Please meet more requirements.'); return }
     setPwdSaving(true)
     try {
-      await usersAPI.changePassword({
-        current_password: pwdForm.current_password,
-        new_password:     pwdForm.new_password,
-      })
+      await usersAPI.changePassword({ current_password: pwdForm.current_password, new_password: pwdForm.new_password })
       toast.success('Password changed successfully')
       setPwdOpen(false)
       setPwdForm({ current_password:'', new_password:'', confirm_password:'' })
@@ -275,14 +433,16 @@ export default function Profile() {
       label: 'Change Password',
       sub: 'Update your login password',
       icon: Lock,
-      onClick: () => { setPwdOpen(o => !o); setPwdForm({ current_password:'', new_password:'', confirm_password:'' }) },
+      onClick: () => { setPwdOpen(o => !o); setSessionsOpen(false); setPwdForm({ current_password:'', new_password:'', confirm_password:'' }) },
+      active: pwdOpen,
     },
     {
       key: 'active-sessions',
       label: 'Active Sessions',
       sub: 'Manage where you are logged in',
       icon: Monitor,
-      onClick: () => toast('Session management coming soon', { icon: '\uD83D\uDCBB' }),
+      onClick: () => { setSessionsOpen(o => !o); setPwdOpen(false) },
+      active: sessionsOpen,
     },
     {
       key: 'logout-everywhere',
@@ -305,7 +465,7 @@ export default function Profile() {
   return (
     <div className={styles.page}>
 
-      {/* ── Hero ── */}
+      {/* Hero */}
       <div className={styles.heroCard}>
         <div className={styles.heroBanner} />
         <div className={styles.heroBody}>
@@ -327,14 +487,14 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ── Stats ── */}
+      {/* Stats */}
       <div className={styles.statGrid}>
         {[...stats.shared, ...(isAdmin ? stats.admin : stats.recruiter)].map(s => (
           <StatCard key={s.label} {...s} />
         ))}
       </div>
 
-      {/* ── Work / Access Summary ── */}
+      {/* Work / Access Summary */}
       <Section title={isAdmin ? 'Access Summary' : 'Work Summary'} icon={isAdmin ? Shield : Activity}>
         <div className={styles.fieldGrid}>
           {isAdmin ? (
@@ -355,7 +515,7 @@ export default function Profile() {
         </div>
       </Section>
 
-      {/* ── Activity ── */}
+      {/* Activity */}
       <Section title={isAdmin ? 'System Activity' : 'Recent Activity'} icon={Activity}>
         {actLoading ? (
           <div className={styles.placeholderBox}><Spinner size={18} /></div>
@@ -373,25 +533,25 @@ export default function Profile() {
         )}
       </Section>
 
-      {/* ── Preferences ── */}
+      {/* Preferences */}
       <Section title="Preferences" icon={Settings}>
         <div className={styles.fieldGrid}>
-          <Field label="Timezone"              value={user?.timezone            || form.timezone}            icon={Globe}   />
-          <Field label="Notification Settings" value={user?.notification_settings}                          icon={Bell}    />
-          <Field label="Language"              value={user?.language            || form.language}            icon={Globe}   />
-          <Field label="Theme"                 value={user?.theme               || form.theme}               icon={Palette} />
-          <Field label="Email Preferences"     value={user?.email_preferences   || form.email_preferences}  icon={AtSign}  />
+          <Field label="Timezone"              value={user?.timezone            || form.timezone}           icon={Globe}   />
+          <Field label="Notification Settings" value={user?.notification_settings}                         icon={Bell}    />
+          <Field label="Language"              value={user?.language            || form.language}           icon={Globe}   />
+          <Field label="Theme"                 value={user?.theme               || form.theme}              icon={Palette} />
+          <Field label="Email Preferences"     value={user?.email_preferences   || form.email_preferences} icon={AtSign}  />
         </div>
       </Section>
 
-      {/* ── Security ── */}
+      {/* Security */}
       <Section title="Security & Account" icon={Shield}>
         <div className={styles.securityList}>
           {securityActions.map(item => (
             <button
               key={item.key}
               type="button"
-              className={`${styles.securityRow} ${item.danger ? styles.securityRowDanger : ''}`}
+              className={`${styles.securityRow} ${item.danger ? styles.securityRowDanger : ''} ${item.active ? styles.securityRowActive : ''}`}
               onClick={item.onClick}
               disabled={item.loading}
             >
@@ -402,17 +562,43 @@ export default function Profile() {
                   <p className={styles.securitySub}>{item.sub}</p>
                 </div>
               </div>
-              {item.loading ? <Spinner size={14} /> : <ChevronRight size={15} className={styles.securityChevron} />}
+              {item.loading
+                ? <Spinner size={14} />
+                : <ChevronRight size={15} className={`${styles.securityChevron} ${item.active ? styles.securityChevronOpen : ''}`} />}
             </button>
           ))}
         </div>
 
-        {/* Change Password inline form */}
+        {/* Active Sessions Panel */}
+        {sessionsOpen && <SessionsPanel />}
+
+        {/* Change Password form */}
         {pwdOpen && (
           <form onSubmit={handleChangePassword} className={styles.pwdForm}>
-            <PwdInput label="Current Password" name="current_password" value={pwdForm.current_password} onChange={handlePwdChange} required />
-            <PwdInput label="New Password"     name="new_password"     value={pwdForm.new_password}     onChange={handlePwdChange} required placeholder="Min 6 characters" />
-            <PwdInput label="Confirm Password" name="confirm_password" value={pwdForm.confirm_password} onChange={handlePwdChange} required />
+            <PwdInput
+              label="Current Password"
+              name="current_password"
+              value={pwdForm.current_password}
+              onChange={handlePwdChange}
+              required
+            />
+            <PwdInput
+              label="New Password"
+              name="new_password"
+              value={pwdForm.new_password}
+              onChange={handlePwdChange}
+              required
+              showStrength
+              placeholder="Min 8 characters"
+            />
+            <PwdInput
+              label="Confirm Password"
+              name="confirm_password"
+              value={pwdForm.confirm_password}
+              onChange={handlePwdChange}
+              required
+              placeholder="Repeat new password"
+            />
             <div className={styles.editActions}>
               <button type="button" className={styles.cancelBtn} onClick={() => setPwdOpen(false)}>Cancel</button>
               <button type="submit" className={styles.saveBtn} disabled={pwdSaving}>
@@ -423,7 +609,7 @@ export default function Profile() {
         )}
       </Section>
 
-      {/* ── Edit Profile form ── */}
+      {/* Edit Profile form */}
       {editOpen && (
         <form id="profile-edit-form" onSubmit={handleSave} className={styles.editForm}>
           <div className={styles.editFormHeader}>
@@ -435,12 +621,12 @@ export default function Profile() {
           </div>
           <div className={styles.editGrid}>
             {[
-              { key:'full_name', label:'Full Name', icon:User,   type:'text',  required:true  },
-              { key:'email',     label:'Email',     icon:Mail,   type:'email', required:true  },
-              { key:'phone',     label:'Phone',     icon:Phone,  type:'tel'                   },
-              { key:'location',  label:'Location',  icon:MapPin, type:'text'                  },
-              { key:'language',  label:'Language',  icon:Globe,  type:'text'                  },
-              { key:'timezone',  label:'Timezone',  icon:Globe,  type:'text'                  },
+              { key:'full_name', label:'Full Name', icon:User,   type:'text',  required:true },
+              { key:'email',     label:'Email',     icon:Mail,   type:'email', required:true },
+              { key:'phone',     label:'Phone',     icon:Phone,  type:'tel'                  },
+              { key:'location',  label:'Location',  icon:MapPin, type:'text'                 },
+              { key:'language',  label:'Language',  icon:Globe,  type:'text'                 },
+              { key:'timezone',  label:'Timezone',  icon:Globe,  type:'text'                 },
             ].map(({ key, label, icon: Icon, type, required }) => (
               <div key={key} className={styles.editField}>
                 <label className={styles.editLabel}>{label}{required && <span className={styles.req}> *</span>}</label>
@@ -467,7 +653,7 @@ export default function Profile() {
         </form>
       )}
 
-      {/* ── Delete confirmation ── */}
+      {/* Delete confirmation */}
       <ConfirmDialog
         open={deleteOpen}
         title="Delete your account?"

@@ -9,19 +9,15 @@ const api = axios.create({
   timeout: 30000,
 })
 
-// Attach JWT to every request
 api.interceptors.request.use(
   (config) => {
     const token = getToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`
     return config
   },
   (error) => Promise.reject(error)
 )
 
-// Handle 401 globally — token expired or invalid
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -58,6 +54,15 @@ export const usersAPI = {
 }
 
 // ==================
+// SESSION ENDPOINTS
+// ==================
+export const sessionsAPI = {
+  getAll: () => api.get('/auth/sessions'),
+  revoke: (sessionId) => api.delete(`/auth/sessions/${sessionId}`),
+  revokeAll: () => api.post('/auth/logout-everywhere'),
+}
+
+// ==================
 // CANDIDATE ENDPOINTS
 // ==================
 export const candidatesAPI = {
@@ -77,7 +82,7 @@ export const resumeAPI = {
     const form = new FormData()
     form.append('file', file)
     return api.post(`/resume/upload/${candidateId}`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
   getByCandidate: (candidateId) => api.get(`/resume/${candidateId}`),
