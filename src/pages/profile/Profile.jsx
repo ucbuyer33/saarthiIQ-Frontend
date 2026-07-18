@@ -4,7 +4,7 @@ import {
   User, Mail, Phone, MapPin, Calendar, CheckSquare,
   CalendarClock, Megaphone, Users, Activity, Settings,
   Shield, Edit3, Save, Globe, Bell, Palette, AtSign,
-  ChevronRight, Lock, Monitor, LogOut, Trash2, Eye, EyeOff,
+  ChevronRight, ChevronDown, ChevronUp, Lock, Monitor, LogOut, Trash2, Eye, EyeOff,
   Laptop, Smartphone, Check, X,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -91,17 +91,10 @@ function Field({ label, value, icon: Icon }) {
   )
 }
 
-// ─── Password input — NO gridColumn span on the field itself ──────────────────
-// The strength panel lives OUTSIDE the grid in a full-width row below.
-function PwdInput({ label, name, value, onChange, required, placeholder, showStrength = false }) {
-  const [show, setShow]       = useState(false)
-  const [focused, setFocused] = useState(false)
-  const strengthIdx = showStrength ? getStrength(value) : -1
-  const sm          = strengthIdx >= 0 ? STRENGTH_META[strengthIdx] : null
-  const showPanel   = showStrength && (value || focused)
-
+// ─── Simple password input (no strength) ─────────────────────────────────────
+function PwdInput({ label, name, value, onChange, required, placeholder }) {
+  const [show, setShow] = useState(false)
   return (
-    // No gridColumn override — all three inputs sit in equal columns
     <div className={styles.editField}>
       <label className={styles.editLabel}>
         {label}{required && <span className={styles.req}> *</span>}
@@ -117,47 +110,11 @@ function PwdInput({ label, name, value, onChange, required, placeholder, showStr
           required={required}
           placeholder={placeholder || label}
           autoComplete="new-password"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
         />
-        <button
-          type="button"
-          className={styles.pwdToggle}
-          onClick={() => setShow(s => !s)}
-          tabIndex={-1}
-        >
+        <button type="button" className={styles.pwdToggle} onClick={() => setShow(s => !s)} tabIndex={-1}>
           {show ? <EyeOff size={13} /> : <Eye size={13} />}
         </button>
       </div>
-
-      {/* Strength panel rendered inside field but visually pushed full-width via CSS */}
-      {showPanel && (
-        <div className={styles.strengthPanel}>
-          <div className={styles.strengthBarTrack}>
-            <div
-              className={styles.strengthBarFill}
-              style={{ width: sm ? sm.pct : '0%', background: sm ? sm.color : '#ef4444' }}
-            />
-          </div>
-          {sm && (
-            <p className={styles.strengthText}>
-              Password strength:{' '}
-              <strong style={{ color: sm.color }}>{sm.label}</strong>
-            </p>
-          )}
-          <ul className={styles.pwRuleList}>
-            {PW_RULES.map(rule => {
-              const passed = value && rule.test(value)
-              return (
-                <li key={rule.key} className={`${styles.pwRule} ${passed ? styles.pwRulePassed : ''}`}>
-                  <span className={styles.pwRuleIcon}><Check size={10} strokeWidth={3} /></span>
-                  {rule.label}
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      )}
     </div>
   )
 }
@@ -187,7 +144,6 @@ function SessionRow({ session, onRevoke, revoking }) {
   const DeviceIcon = isMobile ? Smartphone : Laptop
   const ts         = session.created_at || session.last_active
   const isCurrent  = session.is_current
-
   return (
     <div className={`${styles.sessionRow} ${isCurrent ? styles.sessionRowCurrent : ''}`}>
       <div className={styles.sessionLeft}>
@@ -386,7 +342,7 @@ export default function Profile() {
   const handleChangePassword = async (e) => {
     e.preventDefault()
     if (pwdForm.new_password !== pwdForm.confirm_password) { toast.error('Passwords do not match'); return }
-    if (getStrength(pwdForm.new_password) < 1) { toast.error('Password is too weak. Please meet more requirements.'); return }
+    if (getStrength(pwdForm.new_password) < 1) { toast.error('Password is too weak.'); return }
     setPwdSaving(true)
     try {
       await usersAPI.changePassword({ current_password: pwdForm.current_password, new_password: pwdForm.new_password })
@@ -429,18 +385,19 @@ export default function Profile() {
     setTimeout(() => document.getElementById('profile-edit-form')?.scrollIntoView({ behavior: 'smooth' }), 50)
   }
 
-  // Toggle password form — close sessions if open
   const togglePwd = () => {
     setPwdOpen(o => !o)
     setSessionsOpen(false)
-    setPwdForm({ current_password:'', new_password:'', confirm_password:'' })
+    if (pwdOpen) setPwdForm({ current_password:'', new_password:'', confirm_password:'' })
   }
-
-  // Toggle sessions panel — close password form if open
   const toggleSessions = () => {
     setSessionsOpen(o => !o)
     setPwdOpen(false)
   }
+
+  // strength derived from new_password
+  const strengthIdx = getStrength(pwdForm.new_password)
+  const sm          = strengthIdx >= 0 ? STRENGTH_META[strengthIdx] : null
 
   const securityActions = [
     {
@@ -448,6 +405,8 @@ export default function Profile() {
       label:  'Change Password',
       sub:    'Update your login password',
       icon:   Lock,
+      // Use ChevronDown/Up for this item specifically
+      chevron: pwdOpen ? ChevronUp : ChevronDown,
       onClick: togglePwd,
       active:  pwdOpen,
     },
@@ -456,6 +415,7 @@ export default function Profile() {
       label:  'Active Sessions',
       sub:    'Manage where you are logged in',
       icon:   Monitor,
+      chevron: ChevronRight,
       onClick: toggleSessions,
       active:  sessionsOpen,
     },
@@ -464,6 +424,7 @@ export default function Profile() {
       label:  'Logout Everywhere',
       sub:    'Sign out from all devices',
       icon:   LogOut,
+      chevron: ChevronRight,
       onClick: handleLogoutEverywhere,
       loading: logoutLoading,
     },
@@ -472,6 +433,7 @@ export default function Profile() {
       label:  'Delete Account',
       sub:    'Permanently remove your account',
       icon:   Trash2,
+      chevron: ChevronRight,
       danger: true,
       onClick: () => setDeleteOpen(true),
     },
@@ -562,76 +524,123 @@ export default function Profile() {
       {/* Security */}
       <Section title="Security & Account" icon={Shield}>
         <div className={styles.securityList}>
-          {securityActions.map(item => (
-            <button
-              key={item.key}
-              type="button"
-              className={[
-                styles.securityRow,
-                item.danger  ? styles.securityRowDanger : '',
-                item.active  ? styles.securityRowActive : '',
-              ].join(' ')}
-              onClick={item.onClick}
-              disabled={item.loading}
-            >
-              <div className={styles.securityLeft}>
-                {item.icon && <item.icon size={15} className={styles.securityIcon} />}
-                <div>
-                  <p className={styles.securityLabel}>{item.label}</p>
-                  <p className={styles.securitySub}>{item.sub}</p>
+          {securityActions.map(item => {
+            const ChevronIcon = item.chevron || ChevronRight
+            return (
+              <button
+                key={item.key}
+                type="button"
+                className={[
+                  styles.securityRow,
+                  item.danger ? styles.securityRowDanger : '',
+                  item.active ? styles.securityRowActive : '',
+                ].join(' ')}
+                onClick={item.onClick}
+                disabled={item.loading}
+              >
+                <div className={styles.securityLeft}>
+                  {item.icon && <item.icon size={15} className={styles.securityIcon} />}
+                  <div>
+                    <p className={styles.securityLabel}>{item.label}</p>
+                    <p className={styles.securitySub}>{item.sub}</p>
+                  </div>
                 </div>
-              </div>
-              {item.loading
-                ? <Spinner size={14} />
-                : <ChevronRight
-                    size={15}
-                    className={[
-                      styles.securityChevron,
-                      item.active ? styles.securityChevronOpen : '',
-                    ].join(' ')}
-                  />}
-            </button>
-          ))}
+                {item.loading
+                  ? <Spinner size={14} />
+                  : <ChevronIcon
+                      size={15}
+                      className={[
+                        styles.securityChevron,
+                        // For non-pwd rows that still use ChevronRight, rotate on active
+                        (!item.chevron || item.chevron === ChevronRight) && item.active
+                          ? styles.securityChevronOpen
+                          : '',
+                      ].join(' ')}
+                    />}
+              </button>
+            )
+          })}
         </div>
 
         {/* Sessions panel */}
         {sessionsOpen && <SessionsPanel />}
 
-        {/* Change-password form — 3 equal columns */}
-        {pwdOpen && (
+        {/*
+          Change-password panel
+          Always rendered; CSS handles show/hide with slide animation.
+          .pwdFormWrap controls max-height + opacity + translateY.
+          .pwdFormWrapOpen makes it visible.
+        */}
+        <div className={`${styles.pwdFormWrap} ${pwdOpen ? styles.pwdFormWrapOpen : ''}`}>
           <form onSubmit={handleChangePassword} className={styles.pwdForm}>
-            <PwdInput
-              label="Current Password"
-              name="current_password"
-              value={pwdForm.current_password}
-              onChange={handlePwdChange}
-              required
-            />
-            <PwdInput
-              label="New Password"
-              name="new_password"
-              value={pwdForm.new_password}
-              onChange={handlePwdChange}
-              required
-              showStrength
-              placeholder="Min 8 characters"
-            />
-            <PwdInput
-              label="Confirm Password"
-              name="confirm_password"
-              value={pwdForm.confirm_password}
-              onChange={handlePwdChange}
-              required
-              placeholder="Repeat new password"
-            />
-            <div className={styles.editActions}>
+
+            {/* LEFT — 3 stacked inputs */}
+            <div className={styles.pwdLeft}>
+              <PwdInput
+                label="Current Password"
+                name="current_password"
+                value={pwdForm.current_password}
+                onChange={handlePwdChange}
+                required
+              />
+              {/* Strength bar sits below the New Password input, inside left col */}
+              <div>
+                <PwdInput
+                  label="New Password"
+                  name="new_password"
+                  value={pwdForm.new_password}
+                  onChange={handlePwdChange}
+                  required
+                  placeholder="Min 8 characters"
+                />
+                {/* Bar always visible once there is any value */}
+                <div className={styles.strengthBarTrack} style={{ marginTop: 6 }}>
+                  <div
+                    className={styles.strengthBarFill}
+                    style={{ width: sm ? sm.pct : '0%', background: sm ? sm.color : '#ef4444' }}
+                  />
+                </div>
+                {sm && (
+                  <p className={styles.strengthText} style={{ marginTop: 4 }}>
+                    Password strength: <strong style={{ color: sm.color }}>{sm.label}</strong>
+                  </p>
+                )}
+              </div>
+              <PwdInput
+                label="Confirm Password"
+                name="confirm_password"
+                value={pwdForm.confirm_password}
+                onChange={handlePwdChange}
+                required
+                placeholder="Repeat new password"
+              />
+            </div>
+
+            {/* RIGHT — strength rules */}
+            <div className={styles.pwdRight}>
+              <p className={styles.pwdRightTitle}>Password requirements</p>
+              <ul className={styles.pwRuleList}>
+                {PW_RULES.map(rule => {
+                  const passed = pwdForm.new_password && rule.test(pwdForm.new_password)
+                  return (
+                    <li key={rule.key} className={`${styles.pwRule} ${passed ? styles.pwRulePassed : ''}`}>
+                      <span className={styles.pwRuleIcon}><Check size={10} strokeWidth={3} /></span>
+                      {rule.label}
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+
+            {/* ACTIONS — full width */}
+            <div className={styles.pwdActions}>
               <button type="button" className={styles.cancelBtn} onClick={() => setPwdOpen(false)}>Cancel</button>
               <button type="submit" className={styles.saveBtn} disabled={pwdSaving}>
                 {pwdSaving ? <><Spinner size={13} /> Saving\u2026</> : <><Lock size={13} /> Update Password</>}
               </button>
             </div>
           </form>
-        )}
+        </div>
       </Section>
 
       {/* Edit Profile form */}
@@ -678,7 +687,6 @@ export default function Profile() {
         </form>
       )}
 
-      {/* Delete confirmation */}
       <ConfirmDialog
         open={deleteOpen}
         title="Delete your account?"

@@ -81,8 +81,8 @@
 .securityLabel { font-size:var(--text-sm); font-weight:600; color:var(--color-text); }
 .securityRowDanger .securityLabel { color:var(--color-error); }
 .securitySub { font-size:0.72rem; color:var(--color-text-muted); margin-top:2px; }
-/* Chevron rotates 90deg when panel is open */
 .securityChevron { color:var(--color-text-faint); flex-shrink:0; transition:transform 0.22s ease; }
+/* ChevronRight rows: rotate 90deg when open */
 .securityChevronOpen { transform:rotate(90deg); }
 .securityRow:disabled { opacity:0.55; cursor:not-allowed; }
 
@@ -112,42 +112,95 @@
 .sessionRevokeBtn:hover:not(:disabled) { background:rgba(220,38,38,0.08); color:var(--color-error); border-color:var(--color-error); }
 .sessionRevokeBtn:disabled { opacity:0.5; cursor:not-allowed; }
 
-/* ── Password form
-     3 equal columns. The strength panel inside New Password stretches
-     across all columns by breaking out of normal flow via negative margin trick.
-────────────────────────────────────────────────────────────────────────────── */
+/*
+  ── Change-password animated wrapper ──────────────────────────────────────────
+  Hidden state : max-height 0, opacity 0, shifted UP by 12px, no pointer events
+  Open  state  : max-height large enough, opacity 1, no shift
+  The section has overflow:hidden which clips it during animation.
+  We must NOT put overflow:hidden on the section itself — it's already there
+  via the Section component's .section class.
+*/
+.pwdFormWrap {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-12px);
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity    0.28s ease,
+    transform  0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pwdFormWrapOpen {
+  max-height: 600px;   /* generous ceiling — actual height is auto */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition:
+    max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity    0.28s ease 0.04s,
+    transform  0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Password form — left/right split ─────────────────────────────────────── */
 .pwdForm {
   display: grid;
-  /* Exactly 3 equal columns so all 3 inputs are the same width */
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--space-4);
+  grid-template-columns: 1fr 1fr;  /* left: inputs  |  right: rules */
+  gap: var(--space-4) var(--space-6);
   padding: var(--space-5);
   border-top: 1px solid var(--color-divider);
   background: var(--color-surface-2);
 }
-/* Actions row always full width */
-.pwdForm .editActions {
-  grid-column: 1 / -1;
-  padding: 0;
-  border-top: none;
-  background: none;
-}
-/* The strength panel is inside a normal-width field; let it overflow visually */
-.strengthPanel {
-  margin-top: 8px;
+
+/* Left column — 3 stacked inputs */
+.pwdLeft {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-3);
 }
 
-/* ── Password strength bar & rules ─────────────────────────────────────────── */
+/* Right column — requirements panel */
+.pwdRight {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  align-self: start;
+  margin-top: 20px; /* visually align with second input */
+}
+.pwdRightTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Actions row spans both columns */
+.pwdActions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+
+/* ── Password strength bar ────────────────────────────────────────────────── */
 .strengthBarTrack { height:4px; background:var(--color-border); border-radius:99px; overflow:hidden; }
-.strengthBarFill { height:100%; border-radius:99px; transition:width 0.3s ease, background 0.3s ease; }
-.strengthText { font-size:0.72rem; color:var(--color-text-muted); margin:0; }
-.pwRuleList { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:3px 12px; }
-.pwRule { display:flex; align-items:center; gap:5px; font-size:0.68rem; color:var(--color-text-faint); }
+.strengthBarFill  { height:100%; border-radius:99px; transition:width 0.3s ease, background 0.3s ease; }
+.strengthText     { font-size:0.72rem; color:var(--color-text-muted); margin:0; }
+
+/* ── Password rules list ──────────────────────────────────────────────────── */
+.pwRuleList  { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.pwRule      { display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--color-text-faint); }
 .pwRulePassed { color:#4ade80; }
-.pwRuleIcon { width:14px; height:14px; border-radius:50%; border:1px solid currentColor; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pwRuleIcon  { width:15px; height:15px; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .pwRulePassed .pwRuleIcon { background:#4ade80; border-color:#4ade80; color:#0f172a; }
 
 /* ── Edit form ─────────────────────────────────────────────────────────────── */
@@ -176,9 +229,9 @@
 .saveBtn:disabled { opacity:0.55; cursor:not-allowed; }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
-@media (max-width: 760px) {
-  /* 3-col password form → 1 col on mobile */
+@media (max-width: 680px) {
   .pwdForm { grid-template-columns: 1fr; }
+  .pwdRight { margin-top: 0; }
 }
 @media (max-width: 640px) {
   .heroBody { padding:0 var(--space-4) var(--space-4); }
@@ -188,6 +241,5 @@
   .field:nth-last-child(-n+2) { border-bottom:none; }
   .field:nth-child(4n) { border-right:revert; }
   .field:nth-last-child(-n+4) { border-bottom:revert; }
-  .pwRuleList { grid-template-columns:1fr; }
   .sessionsPanel { overflow-x:auto; }
 }
