@@ -16,7 +16,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import toast from 'react-hot-toast'
 import styles from './Profile.module.css'
 
-// ─── Password strength (mirrors Register page) ────────────────────────────────
+// ─── Password strength ────────────────────────────────────────────────────────
 const PW_RULES = [
   { key: 'len',     label: 'At least 8 characters',     test: p => p.length >= 8 },
   { key: 'upper',   label: 'Contains uppercase letter',  test: p => /[A-Z]/.test(p) },
@@ -91,17 +91,21 @@ function Field({ label, value, icon: Icon }) {
   )
 }
 
-// ─── Password input with show/hide + optional strength meter ─────────────────
+// ─── Password input — NO gridColumn span on the field itself ──────────────────
+// The strength panel lives OUTSIDE the grid in a full-width row below.
 function PwdInput({ label, name, value, onChange, required, placeholder, showStrength = false }) {
-  const [show, setShow]     = useState(false)
+  const [show, setShow]       = useState(false)
   const [focused, setFocused] = useState(false)
   const strengthIdx = showStrength ? getStrength(value) : -1
-  const sm = strengthIdx >= 0 ? STRENGTH_META[strengthIdx] : null
-  const showPanel = showStrength && (value || focused)
+  const sm          = strengthIdx >= 0 ? STRENGTH_META[strengthIdx] : null
+  const showPanel   = showStrength && (value || focused)
 
   return (
-    <div className={styles.editField} style={{ gridColumn: showStrength ? '1 / -1' : undefined }}>
-      <label className={styles.editLabel}>{label}{required && <span className={styles.req}> *</span>}</label>
+    // No gridColumn override — all three inputs sit in equal columns
+    <div className={styles.editField}>
+      <label className={styles.editLabel}>
+        {label}{required && <span className={styles.req}> *</span>}
+      </label>
       <div className={styles.editInputWrap}>
         <Lock size={13} className={styles.editInputIcon} />
         <input
@@ -116,11 +120,17 @@ function PwdInput({ label, name, value, onChange, required, placeholder, showStr
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />
-        <button type="button" className={styles.pwdToggle} onClick={() => setShow(s => !s)} tabIndex={-1}>
+        <button
+          type="button"
+          className={styles.pwdToggle}
+          onClick={() => setShow(s => !s)}
+          tabIndex={-1}
+        >
           {show ? <EyeOff size={13} /> : <Eye size={13} />}
         </button>
       </div>
 
+      {/* Strength panel rendered inside field but visually pushed full-width via CSS */}
       {showPanel && (
         <div className={styles.strengthPanel}>
           <div className={styles.strengthBarTrack}>
@@ -131,7 +141,8 @@ function PwdInput({ label, name, value, onChange, required, placeholder, showStr
           </div>
           {sm && (
             <p className={styles.strengthText}>
-              Password strength: <strong style={{ color: sm.color }}>{sm.label}</strong>
+              Password strength:{' '}
+              <strong style={{ color: sm.color }}>{sm.label}</strong>
             </p>
           )}
           <ul className={styles.pwRuleList}>
@@ -162,7 +173,9 @@ function ActivityRow({ event }) {
         {event.detail && <p className={styles.activityDetail}>{event.detail}</p>}
       </div>
       <span className={styles.activityTime}>
-        {ts ? new Date(ts).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '\u2014'}
+        {ts
+          ? new Date(ts).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+          : '\u2014'}
       </span>
     </div>
   )
@@ -170,17 +183,15 @@ function ActivityRow({ event }) {
 
 // ─── Session row ──────────────────────────────────────────────────────────────
 function SessionRow({ session, onRevoke, revoking }) {
-  const isMobile = /mobile|android|iphone|ipad/i.test(session.user_agent || '')
+  const isMobile   = /mobile|android|iphone|ipad/i.test(session.user_agent || '')
   const DeviceIcon = isMobile ? Smartphone : Laptop
-  const ts = session.created_at || session.last_active
-  const isCurrent = session.is_current
+  const ts         = session.created_at || session.last_active
+  const isCurrent  = session.is_current
 
   return (
     <div className={`${styles.sessionRow} ${isCurrent ? styles.sessionRowCurrent : ''}`}>
       <div className={styles.sessionLeft}>
-        <div className={styles.sessionDeviceIcon}>
-          <DeviceIcon size={16} />
-        </div>
+        <div className={styles.sessionDeviceIcon}><DeviceIcon size={16} /></div>
         <div>
           <p className={styles.sessionDevice}>
             {session.device_name || (isMobile ? 'Mobile Device' : 'Desktop Browser')}
@@ -188,11 +199,13 @@ function SessionRow({ session, onRevoke, revoking }) {
           </p>
           <p className={styles.sessionMeta}>
             {session.ip_address && <span>{session.ip_address}</span>}
-            {session.location  && <span> &middot; {session.location}</span>}
+            {session.location   && <span> &middot; {session.location}</span>}
             {ts && <span> &middot; {new Date(ts).toLocaleDateString()}</span>}
           </p>
           {session.user_agent && (
-            <p className={styles.sessionUA}>{session.user_agent.slice(0, 80)}{session.user_agent.length > 80 ? '' : ''}</p>
+            <p className={styles.sessionUA}>
+              {session.user_agent.slice(0, 80)}{session.user_agent.length > 80 ? '\u2026' : ''}
+            </p>
           )}
         </div>
       </div>
@@ -211,7 +224,7 @@ function SessionRow({ session, onRevoke, revoking }) {
   )
 }
 
-// ─── Active Sessions panel ────────────────────────────────────────────────────
+// ─── Sessions panel ───────────────────────────────────────────────────────────
 function SessionsPanel() {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading]   = useState(true)
@@ -224,12 +237,8 @@ function SessionsPanel() {
     try {
       const res = await sessionsAPI.getAll()
       setSessions(res.data?.data || res.data || [])
-    } catch {
-      // Backend may not have this endpoint yet — show graceful fallback
-      setSessions([])
-    } finally {
-      setLoading(false)
-    }
+    } catch { setSessions([]) }
+    finally { setLoading(false) }
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -242,9 +251,7 @@ function SessionsPanel() {
       setSessions(s => s.filter(x => x.id !== id))
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Failed to revoke session')
-    } finally {
-      setRevoking(null)
-    }
+    } finally { setRevoking(null) }
   }
 
   const handleRevokeAll = async () => {
@@ -261,14 +268,11 @@ function SessionsPanel() {
   return (
     <div className={styles.sessionsPanel}>
       <div className={styles.sessionsPanelHeader}>
-        <p className={styles.sessionsPanelTitle}>
-          <Monitor size={13} /> Active Sessions
-        </p>
+        <p className={styles.sessionsPanelTitle}><Monitor size={13} /> Active Sessions</p>
         <button type="button" className={styles.revokeAllBtn} onClick={handleRevokeAll}>
           <LogOut size={12} /> Logout All
         </button>
       </div>
-
       {loading ? (
         <div className={styles.sessionsLoading}><Spinner size={16} /></div>
       ) : sessions.length === 0 ? (
@@ -293,14 +297,13 @@ export default function Profile() {
   const navigate = useNavigate()
   const { user, setUser, role, logout } = useAuth()
 
-  const [form, setForm]     = useState({ full_name:'', email:'', phone:'', location:'', timezone:'', language:'', theme:'', email_preferences:'' })
-  const [saving, setSaving] = useState(false)
+  const [form, setForm]         = useState({ full_name:'', email:'', phone:'', location:'', timezone:'', language:'', theme:'', email_preferences:'' })
+  const [saving, setSaving]     = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
   const [pwdOpen, setPwdOpen]     = useState(false)
   const [pwdForm, setPwdForm]     = useState({ current_password:'', new_password:'', confirm_password:'' })
   const [pwdSaving, setPwdSaving] = useState(false)
-  const [pwdFocused, setPwdFocused] = useState(false)
 
   const [sessionsOpen, setSessionsOpen] = useState(false)
 
@@ -383,8 +386,7 @@ export default function Profile() {
   const handleChangePassword = async (e) => {
     e.preventDefault()
     if (pwdForm.new_password !== pwdForm.confirm_password) { toast.error('Passwords do not match'); return }
-    const strength = getStrength(pwdForm.new_password)
-    if (strength < 1) { toast.error('Password is too weak. Please meet more requirements.'); return }
+    if (getStrength(pwdForm.new_password) < 1) { toast.error('Password is too weak. Please meet more requirements.'); return }
     setPwdSaving(true)
     try {
       await usersAPI.changePassword({ current_password: pwdForm.current_password, new_password: pwdForm.new_password })
@@ -427,36 +429,49 @@ export default function Profile() {
     setTimeout(() => document.getElementById('profile-edit-form')?.scrollIntoView({ behavior: 'smooth' }), 50)
   }
 
+  // Toggle password form — close sessions if open
+  const togglePwd = () => {
+    setPwdOpen(o => !o)
+    setSessionsOpen(false)
+    setPwdForm({ current_password:'', new_password:'', confirm_password:'' })
+  }
+
+  // Toggle sessions panel — close password form if open
+  const toggleSessions = () => {
+    setSessionsOpen(o => !o)
+    setPwdOpen(false)
+  }
+
   const securityActions = [
     {
-      key: 'change-password',
-      label: 'Change Password',
-      sub: 'Update your login password',
-      icon: Lock,
-      onClick: () => { setPwdOpen(o => !o); setSessionsOpen(false); setPwdForm({ current_password:'', new_password:'', confirm_password:'' }) },
-      active: pwdOpen,
+      key:    'change-password',
+      label:  'Change Password',
+      sub:    'Update your login password',
+      icon:   Lock,
+      onClick: togglePwd,
+      active:  pwdOpen,
     },
     {
-      key: 'active-sessions',
-      label: 'Active Sessions',
-      sub: 'Manage where you are logged in',
-      icon: Monitor,
-      onClick: () => { setSessionsOpen(o => !o); setPwdOpen(false) },
-      active: sessionsOpen,
+      key:    'active-sessions',
+      label:  'Active Sessions',
+      sub:    'Manage where you are logged in',
+      icon:   Monitor,
+      onClick: toggleSessions,
+      active:  sessionsOpen,
     },
     {
-      key: 'logout-everywhere',
-      label: 'Logout Everywhere',
-      sub: 'Sign out from all devices',
-      icon: LogOut,
+      key:    'logout-everywhere',
+      label:  'Logout Everywhere',
+      sub:    'Sign out from all devices',
+      icon:   LogOut,
       onClick: handleLogoutEverywhere,
       loading: logoutLoading,
     },
     {
-      key: 'delete-account',
-      label: 'Delete Account',
-      sub: 'Permanently remove your account',
-      icon: Trash2,
+      key:    'delete-account',
+      label:  'Delete Account',
+      sub:    'Permanently remove your account',
+      icon:   Trash2,
       danger: true,
       onClick: () => setDeleteOpen(true),
     },
@@ -499,10 +514,10 @@ export default function Profile() {
         <div className={styles.fieldGrid}>
           {isAdmin ? (
             <>
-              <Field label="Assigned Role"    value={role || user?.role}       icon={Shield}        />
-              <Field label="Permission Scope" value={user?.permission_scope}   icon={Shield}        />
-              <Field label="Admin Privileges" value={user?.admin_privileges}   icon={Shield}        />
-              <Field label="Users Managed"    value={user?.users_managed}      icon={Users}         />
+              <Field label="Assigned Role"    value={role || user?.role}     icon={Shield}        />
+              <Field label="Permission Scope" value={user?.permission_scope} icon={Shield}        />
+              <Field label="Admin Privileges" value={user?.admin_privileges} icon={Shield}        />
+              <Field label="Users Managed"    value={user?.users_managed}    icon={Users}         />
             </>
           ) : (
             <>
@@ -551,7 +566,11 @@ export default function Profile() {
             <button
               key={item.key}
               type="button"
-              className={`${styles.securityRow} ${item.danger ? styles.securityRowDanger : ''} ${item.active ? styles.securityRowActive : ''}`}
+              className={[
+                styles.securityRow,
+                item.danger  ? styles.securityRowDanger : '',
+                item.active  ? styles.securityRowActive : '',
+              ].join(' ')}
               onClick={item.onClick}
               disabled={item.loading}
             >
@@ -564,15 +583,21 @@ export default function Profile() {
               </div>
               {item.loading
                 ? <Spinner size={14} />
-                : <ChevronRight size={15} className={`${styles.securityChevron} ${item.active ? styles.securityChevronOpen : ''}`} />}
+                : <ChevronRight
+                    size={15}
+                    className={[
+                      styles.securityChevron,
+                      item.active ? styles.securityChevronOpen : '',
+                    ].join(' ')}
+                  />}
             </button>
           ))}
         </div>
 
-        {/* Active Sessions Panel */}
+        {/* Sessions panel */}
         {sessionsOpen && <SessionsPanel />}
 
-        {/* Change Password form */}
+        {/* Change-password form — 3 equal columns */}
         {pwdOpen && (
           <form onSubmit={handleChangePassword} className={styles.pwdForm}>
             <PwdInput
@@ -602,7 +627,7 @@ export default function Profile() {
             <div className={styles.editActions}>
               <button type="button" className={styles.cancelBtn} onClick={() => setPwdOpen(false)}>Cancel</button>
               <button type="submit" className={styles.saveBtn} disabled={pwdSaving}>
-                {pwdSaving ? <><Spinner size={13}/> Saving</> : <><Lock size={13}/> Update Password</>}
+                {pwdSaving ? <><Spinner size={13} /> Saving\u2026</> : <><Lock size={13} /> Update Password</>}
               </button>
             </div>
           </form>
@@ -647,7 +672,7 @@ export default function Profile() {
           <div className={styles.editActions}>
             <button type="button" className={styles.cancelBtn} onClick={() => setEditOpen(false)}>Cancel</button>
             <button type="submit" className={styles.saveBtn} disabled={saving}>
-              {saving ? <><Spinner size={13}/> Saving</> : <><Save size={13}/> Save Changes</>}
+              {saving ? <><Spinner size={13} /> Saving\u2026</> : <><Save size={13} /> Save Changes</>}
             </button>
           </div>
         </form>
