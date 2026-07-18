@@ -3,33 +3,59 @@
 
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
 .heroCard { background:var(--color-surface); border:1px solid var(--color-border); border-radius:18px; overflow:hidden; }
+
 .heroBanner {
-  height:80px;
-  background:linear-gradient(135deg, rgba(99,102,241,0.25) 0%, rgba(8,145,178,0.18) 50%, rgba(99,102,241,0.1) 100%);
+  height:120px;
+  background:linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(8,145,178,0.22) 50%, rgba(99,102,241,0.12) 100%);
   position:relative;
 }
 .heroBanner::after {
   content:''; position:absolute; inset:0;
-  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
-.heroBody { display:flex; align-items:center; gap:var(--space-4); padding:0 var(--space-6) var(--space-5); margin-top:-36px; flex-wrap:wrap; }
-.avatarWrap { flex-shrink:0; }
-.avatarRing { border-radius:50%; padding:3px; background:var(--color-surface); border:2px solid var(--color-border); display:inline-flex; }
-.heroInfo { flex:1; min-width:180px; }
-.heroNameRow { display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; margin-top:var(--space-2); }
+
+/* Body sits below the banner — avatar overlaps by half its height */
+.heroBody {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:var(--space-3);
+  padding:0 var(--space-6) var(--space-6);
+  position:relative;
+}
+
+.avatarWrap {
+  margin-top:-44px; /* pull avatar up to overlap the banner */
+  flex-shrink:0;
+  position:relative;
+  z-index:1;
+}
+.avatarRing {
+  border-radius:50%;
+  padding:4px;
+  background:var(--color-surface);
+  border:2px solid var(--color-border);
+  display:inline-flex;
+  box-shadow:0 4px 16px rgba(0,0,0,0.10);
+}
+
+.heroInfo { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.heroNameRow { display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; justify-content:center; }
 .heroName { font-size:var(--text-2xl); font-weight:800; color:var(--color-text); letter-spacing:-0.03em; line-height:1.2; }
 .roleBadge {
   padding:3px 10px; border-radius:20px; font-size:0.67rem; font-weight:700;
   background:rgba(99,102,241,0.12); color:#6366f1;
 }
 .roleBadge[data-role="admin"] { background:rgba(220,38,38,0.1); color:#dc2626; }
-.heroEmail { display:flex; align-items:center; gap:5px; font-size:var(--text-sm); color:var(--color-text-muted); margin-top:3px; }
+.heroEmail { display:flex; align-items:center; gap:5px; font-size:var(--text-sm); color:var(--color-text-muted); }
+
 .editBtn {
   display:inline-flex; align-items:center; gap:6px;
-  padding:9px 18px; border-radius:10px; border:1px solid var(--color-border);
+  padding:9px 20px; border-radius:10px; border:1px solid var(--color-border);
   background:var(--color-surface-offset); color:var(--color-text);
   font-size:var(--text-sm); font-weight:600; font-family:var(--font-body);
-  cursor:pointer; white-space:nowrap; margin-left:auto;
+  cursor:pointer; white-space:nowrap; margin-top:var(--space-1);
   transition:background var(--transition-fast),border-color var(--transition-fast),box-shadow var(--transition-fast);
 }
 .editBtn:hover { background:var(--color-accent); border-color:var(--color-accent); color:#fff; box-shadow:0 4px 14px rgba(99,102,241,0.3); }
@@ -110,8 +136,7 @@
 .saveBtn:disabled { opacity:0.55; cursor:not-allowed; }
 
 @media (max-width:640px) {
-  .heroBody { padding:0 var(--space-4) var(--space-4); }
-  .editBtn { width:100%; justify-content:center; margin-left:0; }
+  .heroBody { padding:0 var(--space-4) var(--space-5); }
   .fieldGrid { grid-template-columns:1fr 1fr; }
   .field:nth-child(2n) { border-right:none; }
   .field:nth-last-child(-n+2) { border-bottom:none; }
