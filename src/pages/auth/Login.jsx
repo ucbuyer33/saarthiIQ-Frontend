@@ -40,7 +40,7 @@ export default function Login() {
       <div className={styles.card}>
         {/* Logo */}
         <div className={styles.logo}>
-          <svg viewBox="0 0 32 32" fill="none" width="40" height="40">
+          <svg viewBox="0 0 32 32" fill="none" width="40" height="40" aria-hidden="true">
             <rect width="32" height="32" rx="8" fill="var(--color-primary)" />
             <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             <circle cx="16" cy="10" r="2" fill="white" />
@@ -50,7 +50,7 @@ export default function Login() {
         </div>
 
         <h1 className={styles.title}>Welcome back</h1>
-        <p className={styles.subtitle}>Sign in to your account</p>
+        <p className={styles.subtitle}>Sign in to continue your hiring journey.</p>
 
         {error && <div className="alert alert-error">{error}</div>}
 
@@ -70,7 +70,7 @@ export default function Login() {
           </div>
 
           <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <label className="label" htmlFor="password">Password</label>
               <Link to="/forgot-password" className="text-link" style={{ fontSize: 'var(--text-xs)' }}>Forgot password?</Link>
             </div>
@@ -83,12 +83,14 @@ export default function Login() {
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 required
+                autoComplete="current-password"
                 style={{ paddingRight: 'var(--space-10)' }}
               />
               <button
                 type="button"
                 onClick={() => setShowPw(p => !p)}
-                style={{ position: 'absolute', right: 'var(--space-3)', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}
+                style={{ position: 'absolute', right: 'var(--space-3)', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--icon-muted)' }}
+                aria-label={showPw ? 'Hide password' : 'Show password'}
               >
                 {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
