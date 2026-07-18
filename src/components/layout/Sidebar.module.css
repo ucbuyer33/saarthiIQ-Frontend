@@ -87,7 +87,6 @@
   font-size: var(--text-sm);
   font-weight: 700;
   /* Always white — logo lives on the dark shell */
-  color: #f1f5f9;
   white-space: nowrap;
   letter-spacing: -0.02em;
   line-height: 1;
