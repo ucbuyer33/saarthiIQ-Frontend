@@ -18,18 +18,18 @@ import styles from './Profile.module.css'
 
 // ─── Password strength ────────────────────────────────────────────────────────
 const PW_RULES = [
-  { key: 'len',     label: 'At least 8 characters',     test: p => p.length >= 8 },
-  { key: 'upper',   label: 'Contains uppercase letter',  test: p => /[A-Z]/.test(p) },
-  { key: 'lower',   label: 'Contains lowercase letter',  test: p => /[a-z]/.test(p) },
-  { key: 'number',  label: 'Contains a number',          test: p => /[0-9]/.test(p) },
+  { key: 'len', label: 'At least 8 characters', test: p => p.length >= 8 },
+  { key: 'upper', label: 'Contains uppercase letter', test: p => /[A-Z]/.test(p) },
+  { key: 'lower', label: 'Contains lowercase letter', test: p => /[a-z]/.test(p) },
+  { key: 'number', label: 'Contains a number', test: p => /[0-9]/.test(p) },
   { key: 'special', label: 'Contains special character', test: p => /[^A-Za-z0-9]/.test(p) },
 ]
 const STRENGTH_META = [
-  { label: 'Very Weak', color: '#ef4444', pct: '20%'  },
-  { label: 'Weak',      color: '#ef4444', pct: '20%'  },
-  { label: 'Fair',      color: '#f59e0b', pct: '50%'  },
-  { label: 'Good',      color: '#4db6bc', pct: '75%'  },
-  { label: 'Strong',    color: '#4ade80', pct: '100%' },
+  { label: 'Very Weak', color: '#ef4444', pct: '20%' },
+  { label: 'Weak', color: '#ef4444', pct: '20%' },
+  { label: 'Fair', color: '#f59e0b', pct: '50%' },
+  { label: 'Good', color: '#4db6bc', pct: '75%' },
+  { label: 'Strong', color: '#4ade80', pct: '100%' },
 ]
 function getStrength(pw) {
   if (!pw) return -1
@@ -41,19 +41,19 @@ function allRulesPassed(pw) {
 
 // ─── Stat meta ────────────────────────────────────────────────────────────────
 const STAT_META = {
-  Email:                 { icon: Mail,          gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
-  Phone:                 { icon: Phone,         gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
-  Location:              { icon: MapPin,        gradient: 'linear-gradient(135deg,#16a34a,#15803d)' },
-  Joined:                { icon: Calendar,      gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
-  'Candidates Created':  { icon: Users,         gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
-  'Interviews Scheduled':{ icon: CalendarClock, gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
-  'Campaigns Created':   { icon: Megaphone,     gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
-  'Tasks Completed':     { icon: CheckSquare,   gradient: 'linear-gradient(135deg,#16a34a,#15803d)' },
-  'Last Activity':       { icon: Activity,      gradient: 'linear-gradient(135deg,#7c3aed,#6d28d9)' },
-  'Assigned Role':       { icon: Shield,        gradient: 'linear-gradient(135deg,#dc2626,#b91c1c)' },
-  'Permission Scope':    { icon: Shield,        gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
-  'Admin Privileges':    { icon: Shield,        gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
-  'Users Managed':       { icon: Users,         gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
+  Email: { icon: Mail, gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
+  Phone: { icon: Phone, gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
+  Location: { icon: MapPin, gradient: 'linear-gradient(135deg,#16a34a,#15803d)' },
+  Joined: { icon: Calendar, gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
+  'Candidates Created': { icon: Users, gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
+  'Interviews Scheduled': { icon: CalendarClock, gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
+  'Campaigns Created': { icon: Megaphone, gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
+  'Tasks Completed': { icon: CheckSquare, gradient: 'linear-gradient(135deg,#16a34a,#15803d)' },
+  'Last Activity': { icon: Activity, gradient: 'linear-gradient(135deg,#7c3aed,#6d28d9)' },
+  'Assigned Role': { icon: Shield, gradient: 'linear-gradient(135deg,#dc2626,#b91c1c)' },
+  'Permission Scope': { icon: Shield, gradient: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
+  'Admin Privileges': { icon: Shield, gradient: 'linear-gradient(135deg,#d97706,#b45309)' },
+  'Users Managed': { icon: Users, gradient: 'linear-gradient(135deg,#0891b2,#0e7490)' },
 }
 
 function StatCard({ label, value }) {
@@ -145,10 +145,10 @@ function ActivityRow({ event }) {
 
 // ─── Session row ──────────────────────────────────────────────────────────────
 function SessionRow({ session, onRevoke, revoking }) {
-  const isMobile   = /mobile|android|iphone|ipad/i.test(session.user_agent || '')
+  const isMobile = /mobile|android|iphone|ipad/i.test(session.user_agent || '')
   const DeviceIcon = isMobile ? Smartphone : Laptop
-  const ts         = session.created_at || session.last_active
-  const isCurrent  = session.is_current
+  const ts = session.created_at || session.last_active
+  const isCurrent = session.is_current
   return (
     <div className={`${styles.sessionRow} ${isCurrent ? styles.sessionRowCurrent : ''}`}>
       <div className={styles.sessionLeft}>
@@ -160,7 +160,7 @@ function SessionRow({ session, onRevoke, revoking }) {
           </p>
           <p className={styles.sessionMeta}>
             {session.ip_address && <span>{session.ip_address}</span>}
-            {session.location   && <span> &middot; {session.location}</span>}
+            {session.location && <span> &middot; {session.location}</span>}
             {ts && <span> &middot; {new Date(ts).toLocaleDateString()}</span>}
           </p>
           {session.user_agent && (
@@ -188,10 +188,10 @@ function SessionRow({ session, onRevoke, revoking }) {
 // ─── Sessions panel ───────────────────────────────────────────────────────────
 function SessionsPanel() {
   const [sessions, setSessions] = useState([])
-  const [loading, setLoading]   = useState(true)
+  const [loading, setLoading] = useState(true)
   const [revoking, setRevoking] = useState(null)
   const { logout } = useAuth()
-  const navigate   = useNavigate()
+  const navigate = useNavigate()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -258,12 +258,12 @@ export default function Profile() {
   const navigate = useNavigate()
   const { user, setUser, role, logout } = useAuth()
 
-  const [form, setForm]         = useState({ full_name:'', email:'', phone:'', location:'', timezone:'', language:'', theme:'', email_preferences:'' })
-  const [saving, setSaving]     = useState(false)
+  const [form, setForm] = useState({ full_name: '', email: '', phone: '', location: '', timezone: '', language: '', theme: '', email_preferences: '' })
+  const [saving, setSaving] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
-  const [pwdOpen, setPwdOpen]     = useState(false)
-  const [pwdForm, setPwdForm]     = useState({ current_password:'', new_password:'', confirm_password:'' })
+  const [pwdOpen, setPwdOpen] = useState(false)
+  const [pwdForm, setPwdForm] = useState({ current_password: '', new_password: '', confirm_password: '' })
   const [pwdSaving, setPwdSaving] = useState(false)
   // Controls visibility of requirements panel:
   // shown when new_password has content AND (field is focused OR not all rules passed yet)
@@ -272,22 +272,22 @@ export default function Profile() {
   const [sessionsOpen, setSessionsOpen] = useState(false)
 
   const [logoutLoading, setLogoutLoading] = useState(false)
-  const [deleteOpen, setDeleteOpen]       = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-  const [activity, setActivity]     = useState([])
+  const [activity, setActivity] = useState([])
   const [actLoading, setActLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
       setForm({
-        full_name:         user.full_name         || '',
-        email:             user.email             || '',
-        phone:             user.phone             || '',
-        location:          user.location          || '',
-        timezone:          user.timezone          || '',
-        language:          user.language          || '',
-        theme:             user.theme             || '',
+        full_name: user.full_name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        location: user.location || '',
+        timezone: user.timezone || '',
+        language: user.language || '',
+        theme: user.theme || '',
         email_preferences: user.email_preferences || '',
       })
     }
@@ -306,31 +306,31 @@ export default function Profile() {
 
   const stats = useMemo(() => {
     const shared = [
-      { label: 'Email',    value: user?.email },
-      { label: 'Phone',    value: user?.phone },
+      { label: 'Email', value: user?.email },
+      { label: 'Phone', value: user?.phone },
       { label: 'Location', value: user?.location },
-      { label: 'Joined',   value: user?.created_at ? new Date(user.created_at).toLocaleDateString() : '\u2014' },
+      { label: 'Joined', value: user?.created_at ? new Date(user.created_at).toLocaleDateString() : '\u2014' },
     ]
     const recruiter = [
-      { label: 'Candidates Created',    value: user?.candidates_created },
-      { label: 'Interviews Scheduled',  value: user?.interviews_scheduled },
-      { label: 'Campaigns Created',     value: user?.campaigns_created },
-      { label: 'Tasks Completed',       value: user?.tasks_completed },
-      { label: 'Last Activity',         value: user?.last_activity ? new Date(user.last_activity).toLocaleString() : '\u2014' },
+      { label: 'Candidates Created', value: user?.candidates_created },
+      { label: 'Interviews Scheduled', value: user?.interviews_scheduled },
+      { label: 'Campaigns Created', value: user?.campaigns_created },
+      { label: 'Tasks Completed', value: user?.tasks_completed },
+      { label: 'Last Activity', value: user?.last_activity ? new Date(user.last_activity).toLocaleString() : '\u2014' },
     ]
     const admin = [
-      { label: 'Assigned Role',    value: role || user?.role },
+      { label: 'Assigned Role', value: role || user?.role },
       { label: 'Permission Scope', value: user?.permission_scope },
       { label: 'Admin Privileges', value: user?.admin_privileges },
-      { label: 'Users Managed',    value: user?.users_managed },
-      { label: 'Last Activity',    value: user?.last_activity ? new Date(user.last_activity).toLocaleString() : '\u2014' },
+      { label: 'Users Managed', value: user?.users_managed },
+      { label: 'Last Activity', value: user?.last_activity ? new Date(user.last_activity).toLocaleString() : '\u2014' },
     ]
     return { shared, recruiter, admin }
   }, [user, role])
 
   const isAdmin = role === 'admin'
 
-  const handleChange    = key => e => setForm(f => ({ ...f, [key]: e.target.value }))
+  const handleChange = key => e => setForm(f => ({ ...f, [key]: e.target.value }))
   const handlePwdChange = e => setPwdForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
   const handleSave = async (e) => {
@@ -356,7 +356,7 @@ export default function Profile() {
       await usersAPI.changePassword({ current_password: pwdForm.current_password, new_password: pwdForm.new_password })
       toast.success('Password changed successfully')
       setPwdOpen(false)
-      setPwdForm({ current_password:'', new_password:'', confirm_password:'' })
+      setPwdForm({ current_password: '', new_password: '', confirm_password: '' })
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Failed to change password')
     } finally { setPwdSaving(false) }
@@ -398,7 +398,7 @@ export default function Profile() {
     setPwdOpen(opening)
     setSessionsOpen(false)
     if (!opening) {
-      setPwdForm({ current_password:'', new_password:'', confirm_password:'' })
+      setPwdForm({ current_password: '', new_password: '', confirm_password: '' })
       setNewPwdFocused(false)
     }
   }
@@ -409,7 +409,7 @@ export default function Profile() {
 
   // Derived strength state
   const strengthIdx = getStrength(pwdForm.new_password)
-  const sm          = strengthIdx >= 0 ? STRENGTH_META[strengthIdx] : null
+  const sm = strengthIdx >= 0 ? STRENGTH_META[strengthIdx] : null
 
   // Requirements panel: show when field has content AND (focused OR not all passed)
   const showRequirements = !!pwdForm.new_password && (newPwdFocused || !allRulesPassed(pwdForm.new_password))
@@ -446,27 +446,6 @@ export default function Profile() {
         ))}
       </div>
 
-      {/* Work / Access Summary */}
-      <Section title={isAdmin ? 'Access Summary' : 'Work Summary'} icon={isAdmin ? Shield : Activity}>
-        <div className={styles.fieldGrid}>
-          {isAdmin ? (
-            <>
-              <Field label="Assigned Role"    value={role || user?.role}     icon={Shield}        />
-              <Field label="Permission Scope" value={user?.permission_scope} icon={Shield}        />
-              <Field label="Admin Privileges" value={user?.admin_privileges} icon={Shield}        />
-              <Field label="Users Managed"    value={user?.users_managed}    icon={Users}         />
-            </>
-          ) : (
-            <>
-              <Field label="Active Candidates"  value={user?.active_candidates}    icon={Users}         />
-              <Field label="Resumes Processed"  value={user?.resumes_processed}    icon={CheckSquare}   />
-              <Field label="Interviews"         value={user?.interviews_scheduled} icon={CalendarClock} />
-              <Field label="Campaigns Owned"    value={user?.campaigns_owned}      icon={Megaphone}     />
-            </>
-          )}
-        </div>
-      </Section>
-
       {/* Activity */}
       <Section title={isAdmin ? 'System Activity' : 'Recent Activity'} icon={Activity}>
         {actLoading ? (
@@ -483,17 +462,6 @@ export default function Profile() {
             {activity.map((ev, i) => <ActivityRow key={ev.id || i} event={ev} />)}
           </div>
         )}
-      </Section>
-
-      {/* Preferences */}
-      <Section title="Preferences" icon={Settings}>
-        <div className={styles.fieldGrid}>
-          <Field label="Timezone"              value={user?.timezone            || form.timezone}           icon={Globe}   />
-          <Field label="Notification Settings" value={user?.notification_settings}                         icon={Bell}    />
-          <Field label="Language"              value={user?.language            || form.language}           icon={Globe}   />
-          <Field label="Theme"                 value={user?.theme               || form.theme}              icon={Palette} />
-          <Field label="Email Preferences"     value={user?.email_preferences   || form.email_preferences} icon={AtSign}  />
-        </div>
       </Section>
 
       {/* Security */}
@@ -587,7 +555,7 @@ export default function Profile() {
 
             {/* ACTIONS */}
             <div className={styles.pwdActions}>
-              <button type="button" className={styles.cancelBtn} onClick={() => { setPwdOpen(false); setPwdForm({ current_password:'', new_password:'', confirm_password:'' }); setNewPwdFocused(false) }}>Cancel</button>
+              <button type="button" className={styles.cancelBtn} onClick={() => { setPwdOpen(false); setPwdForm({ current_password: '', new_password: '', confirm_password: '' }); setNewPwdFocused(false) }}>Cancel</button>
               <button type="submit" className={styles.saveBtn} disabled={pwdSaving}>
                 {pwdSaving ? <><Spinner size={13} /> Saving\u2026</> : <><Lock size={13} /> Update Password</>}
               </button>
@@ -661,12 +629,12 @@ export default function Profile() {
           </div>
           <div className={styles.editGrid}>
             {[
-              { key:'full_name', label:'Full Name', icon:User,   type:'text',  required:true },
-              { key:'email',     label:'Email',     icon:Mail,   type:'email', required:true },
-              { key:'phone',     label:'Phone',     icon:Phone,  type:'tel'                  },
-              { key:'location',  label:'Location',  icon:MapPin, type:'text'                 },
-              { key:'language',  label:'Language',  icon:Globe,  type:'text'                 },
-              { key:'timezone',  label:'Timezone',  icon:Globe,  type:'text'                 },
+              { key: 'full_name', label: 'Full Name', icon: User, type: 'text', required: true },
+              { key: 'email', label: 'Email', icon: Mail, type: 'email', required: true },
+              { key: 'phone', label: 'Phone', icon: Phone, type: 'tel' },
+              { key: 'location', label: 'Location', icon: MapPin, type: 'text' },
+              { key: 'language', label: 'Language', icon: Globe, type: 'text' },
+              { key: 'timezone', label: 'Timezone', icon: Globe, type: 'text' },
             ].map(({ key, label, icon: Icon, type, required }) => (
               <div key={key} className={styles.editField}>
                 <label className={styles.editLabel}>{label}{required && <span className={styles.req}> *</span>}</label>
