@@ -44,11 +44,11 @@ export default function Register() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>
-          <svg viewBox="0 0 32 32" fill="none" width="40" height="40"><rect width="32" height="32" rx="8" fill="var(--color-primary)" /><path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="16" cy="10" r="2" fill="white" /><line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" /></svg>
+          <svg viewBox="0 0 32 32" fill="none" width="40" height="40" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--color-primary)" /><path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="16" cy="10" r="2" fill="white" /><line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" /></svg>
           <span className={styles.logoText}>SaarthiIQ</span>
         </div>
         <h1 className={styles.title}>Create account</h1>
-        <p className={styles.subtitle}>Join your team on SaarthiIQ</p>
+        <p className={styles.subtitle}>Join your team on SaarthiIQ.</p>
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className="form-group">
