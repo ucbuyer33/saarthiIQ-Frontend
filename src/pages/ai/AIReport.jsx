@@ -1,53 +1,87 @@
+// src/pages/ai/AIReport.jsx
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Brain } from 'lucide-react'
+import { Brain, Sparkles, Search, FileText } from 'lucide-react'
 import { aiAPI } from '@/lib/api'
-import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
+import styles from './AIPages.module.css'
 
 export default function AIReport() {
-  const [params] = useSearchParams()
+  const [params]        = useSearchParams()
   const [candidateId, setCandidateId] = useState(params.get('candidate') || '')
-  const [report, setReport] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [report, setReport]           = useState(null)
+  const [loading, setLoading]         = useState(false)
 
   const generate = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setReport(null)
     try {
-      const res = await aiAPI.aiReport(latestResume.id)
+      const res = await aiAPI.aiReport(candidateId)
       setReport(res.data)
-    } catch (error) {
+    } catch {
       toast.error('Report generation failed')
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
 
   return (
-    <div style={{ maxWidth: 760 }}>
-      <PageHeader title="AI Candidate Report" subtitle="Generate a comprehensive AI-powered hiring recommendation" />
-      <div className="card">
-        <form onSubmit={generate} style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
-          <input className="input" style={{ flex: 1 }} placeholder="Candidate ID" value={candidateId} onChange={e => setCandidateId(e.target.value)} required />
-          <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? <Spinner size={14} /> : <><Brain size={14} /> Generate</>}
+    <div className={styles.page}>
+
+      {/* Header */}
+      <div className={styles.pageHeader}>
+        <div className={styles.headerIcon} style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}>
+          <Brain size={20} />
+        </div>
+        <div>
+          <h1 className={styles.pageTitle}>AI Candidate Report</h1>
+          <p className={styles.pageSubtitle}>Generate a comprehensive AI-powered hiring recommendation</p>
+        </div>
+      </div>
+
+      {/* Input card */}
+      <div className={styles.card}>
+        <form onSubmit={generate} className={styles.searchRow}>
+          <div className={styles.searchWrap}>
+            <Search size={14} className={styles.searchIcon} />
+            <input
+              className={styles.searchInput}
+              placeholder="Enter Candidate ID…"
+              value={candidateId}
+              onChange={e => setCandidateId(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className={styles.actionBtn} disabled={loading}
+            style={loading ? {} : { background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}
+          >
+            {loading
+              ? <><Spinner size={14} /> Generating…</>
+              : <><Sparkles size={14} /> Generate Report</>}
           </button>
         </form>
-        {loading && (
-          <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-muted)' }}>
-            <Spinner size={24} />
-            <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-sm)' }}>AI is generating the report...</p>
-          </div>
-        )}
-        {report && (
-          <div style={{ borderTop: '1px solid var(--color-divider)', paddingTop: 'var(--space-5)' }}>
-            <h3 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>Report</h3>
-            <div style={{ fontSize: 'var(--text-sm)', lineHeight: 1.7, color: 'var(--color-text)', whiteSpace: 'pre-wrap' }}>{report.report || JSON.stringify(report, null, 2)}</div>
-          </div>
-        )}
       </div>
+
+      {/* Loading */}
+      {loading && (
+        <div className={styles.loadingState}>
+          <Spinner size={24} />
+          <p>AI is generating the report… this may take a few seconds.</p>
+        </div>
+      )}
+
+      {/* Report */}
+      {report && !loading && (
+        <div className={styles.reportCard}>
+          <div className={styles.reportHeader}>
+            <FileText size={15} />
+            <span>Candidate Report</span>
+          </div>
+          <div className={styles.reportBody}>
+            {report.report || JSON.stringify(report, null, 2)}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
