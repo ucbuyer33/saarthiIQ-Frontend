@@ -1,3 +1,4 @@
+// saarthiIQ-Frontend\src\pages\admin\AuditLog.jsx
 import { useEffect, useState } from 'react'
 import { auditAPI } from '@/lib/api'
 import PageHeader from '@/components/ui/PageHeader'
@@ -9,7 +10,7 @@ export default function AuditLog() {
 
   useEffect(() => {
     auditAPI
-      .getAll()
+      .getAll({ page: 1, limit: 50 })
       .then((r) => setLogs(r.data?.results || []))
       .catch((err) => {
         console.error('Failed to load audit logs', err)
@@ -17,7 +18,6 @@ export default function AuditLog() {
       })
       .finally(() => setLoading(false))
   }, [])
-
   return (
     <div>
       <PageHeader

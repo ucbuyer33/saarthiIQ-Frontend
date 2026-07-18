@@ -296,10 +296,13 @@ export default function Profile() {
   const loadActivity = useCallback(async () => {
     setActLoading(true)
     try {
-      const res = await auditAPI.getAll({ limit: 10 })
-      setActivity(res.data?.results || res.data || [])
-    } catch { setActivity([]) }
-    finally { setActLoading(false) }
+      const res = await auditAPI.getAll({ page: 1, limit: 10 })
+      setActivity(res.data?.results || [])
+    } catch {
+      setActivity([])
+    } finally {
+      setActLoading(false)
+    }
   }, [])
 
   useEffect(() => { loadActivity() }, [loadActivity])
@@ -453,22 +456,21 @@ export default function Profile() {
         ) : activity.length === 0 ? (
           <div className={styles.placeholderBox}>
             <Activity size={18} className={styles.placeholderIcon} />
-            <p className={styles.placeholderText}>
-              {isAdmin ? 'Recent audit events will appear here.' : 'Latest candidate updates and task changes will appear here.'}
-            </p>
+            <p className={styles.placeholderText}>Latest activity will appear here.</p>
           </div>
         ) : (
           <div className={styles.activityList}>
             {activity.map((ev, i) => <ActivityRow key={ev.id || i} event={ev} />)}
           </div>
-        )}
-      </Section>
+        )
+        }
+      </Section >
 
       {/* Security */}
-      <Section title="Security & Account" icon={Shield}>
+      < Section title="Security & Account" icon={Shield} >
 
         {/* ── Change Password row */}
-        <button
+        < button
           type="button"
           className={`${styles.securityRow} ${pwdOpen ? styles.securityRowActive : ''}`}
           onClick={togglePwd}
@@ -481,10 +483,10 @@ export default function Profile() {
             </div>
           </div>
           {pwdOpen ? <ChevronUp size={15} className={styles.securityChevron} /> : <ChevronDown size={15} className={styles.securityChevron} />}
-        </button>
+        </button >
 
         {/* ── Change-password form — slides in/out between the two rows */}
-        <div className={`${styles.pwdFormWrap} ${pwdOpen ? styles.pwdFormWrapOpen : ''}`}>
+        < div className={`${styles.pwdFormWrap} ${pwdOpen ? styles.pwdFormWrapOpen : ''}`}>
           <form onSubmit={handleChangePassword} className={styles.pwdForm}>
 
             {/* LEFT — 3 stacked inputs */}
@@ -561,10 +563,10 @@ export default function Profile() {
               </button>
             </div>
           </form>
-        </div>
+        </div >
 
         {/* ── Active Sessions row */}
-        <button
+        < button
           type="button"
           className={`${styles.securityRow} ${sessionsOpen ? styles.securityRowActive : ''}`}
           onClick={toggleSessions}
@@ -577,7 +579,7 @@ export default function Profile() {
             </div>
           </div>
           <ChevronRight size={15} className={`${styles.securityChevron} ${sessionsOpen ? styles.securityChevronOpen : ''}`} />
-        </button>
+        </button >
 
         {/* Sessions panel */}
         {sessionsOpen && <SessionsPanel />}
@@ -615,51 +617,53 @@ export default function Profile() {
           <ChevronRight size={15} className={styles.securityChevron} />
         </button>
 
-      </Section>
+      </Section >
 
       {/* Edit Profile form */}
-      {editOpen && (
-        <form id="profile-edit-form" onSubmit={handleSave} className={styles.editForm}>
-          <div className={styles.editFormHeader}>
-            <div className={styles.editFormIcon}><Edit3 size={16} /></div>
-            <div>
-              <h2 className={styles.editFormTitle}>Edit Profile</h2>
-              <p className={styles.editFormSub}>Update your personal information</p>
-            </div>
-          </div>
-          <div className={styles.editGrid}>
-            {[
-              { key: 'full_name', label: 'Full Name', icon: User, type: 'text', required: true },
-              { key: 'email', label: 'Email', icon: Mail, type: 'email', required: true },
-              { key: 'phone', label: 'Phone', icon: Phone, type: 'tel' },
-              { key: 'location', label: 'Location', icon: MapPin, type: 'text' },
-              { key: 'language', label: 'Language', icon: Globe, type: 'text' },
-              { key: 'timezone', label: 'Timezone', icon: Globe, type: 'text' },
-            ].map(({ key, label, icon: Icon, type, required }) => (
-              <div key={key} className={styles.editField}>
-                <label className={styles.editLabel}>{label}{required && <span className={styles.req}> *</span>}</label>
-                <div className={styles.editInputWrap}>
-                  <Icon size={13} className={styles.editInputIcon} />
-                  <input
-                    className={styles.editInput}
-                    type={type}
-                    value={form[key]}
-                    onChange={handleChange(key)}
-                    required={required}
-                    placeholder={label}
-                  />
-                </div>
+      {
+        editOpen && (
+          <form id="profile-edit-form" onSubmit={handleSave} className={styles.editForm}>
+            <div className={styles.editFormHeader}>
+              <div className={styles.editFormIcon}><Edit3 size={16} /></div>
+              <div>
+                <h2 className={styles.editFormTitle}>Edit Profile</h2>
+                <p className={styles.editFormSub}>Update your personal information</p>
               </div>
-            ))}
-          </div>
-          <div className={styles.editActions}>
-            <button type="button" className={styles.cancelBtn} onClick={() => setEditOpen(false)}>Cancel</button>
-            <button type="submit" className={styles.saveBtn} disabled={saving}>
-              {saving ? <><Spinner size={13} /> Saving\u2026</> : <><Save size={13} /> Save Changes</>}
-            </button>
-          </div>
-        </form>
-      )}
+            </div>
+            <div className={styles.editGrid}>
+              {[
+                { key: 'full_name', label: 'Full Name', icon: User, type: 'text', required: true },
+                { key: 'email', label: 'Email', icon: Mail, type: 'email', required: true },
+                { key: 'phone', label: 'Phone', icon: Phone, type: 'tel' },
+                { key: 'location', label: 'Location', icon: MapPin, type: 'text' },
+                { key: 'language', label: 'Language', icon: Globe, type: 'text' },
+                { key: 'timezone', label: 'Timezone', icon: Globe, type: 'text' },
+              ].map(({ key, label, icon: Icon, type, required }) => (
+                <div key={key} className={styles.editField}>
+                  <label className={styles.editLabel}>{label}{required && <span className={styles.req}> *</span>}</label>
+                  <div className={styles.editInputWrap}>
+                    <Icon size={13} className={styles.editInputIcon} />
+                    <input
+                      className={styles.editInput}
+                      type={type}
+                      value={form[key]}
+                      onChange={handleChange(key)}
+                      required={required}
+                      placeholder={label}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className={styles.editActions}>
+              <button type="button" className={styles.cancelBtn} onClick={() => setEditOpen(false)}>Cancel</button>
+              <button type="submit" className={styles.saveBtn} disabled={saving}>
+                {saving ? <><Spinner size={13} /> Saving\u2026</> : <><Save size={13} /> Save Changes</>}
+              </button>
+            </div>
+          </form>
+        )
+      }
 
       <ConfirmDialog
         open={deleteOpen}
@@ -672,6 +676,6 @@ export default function Profile() {
         onConfirm={handleDeleteAccount}
         onClose={() => { if (!deleteLoading) setDeleteOpen(false) }}
       />
-    </div>
+    </div >
   )
 }
