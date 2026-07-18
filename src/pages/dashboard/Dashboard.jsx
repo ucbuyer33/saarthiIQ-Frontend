@@ -61,7 +61,7 @@ export default function Dashboard() {
       <div className={styles.hero}>
         <div className={styles.heroText}>
           <h1 className={styles.heroGreeting}>
-            {greeting()}, {firstName} \u{1F44B}
+            {greeting()}, {firstName}
           </h1>
           <p className={styles.heroSub}>{today} &mdash; Here&apos;s your pipeline at a glance.</p>
         </div>
