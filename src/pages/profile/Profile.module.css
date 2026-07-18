@@ -61,7 +61,7 @@
 .activityDetail { font-size:0.72rem; color:var(--color-text-muted); margin-top:2px; }
 .activityTime { font-size:0.68rem; color:var(--color-text-faint); white-space:nowrap; flex-shrink:0; padding-top:2px; }
 
-/* ── Security list ─────────────────────────────────────────────────────────── */
+/* ── Security rows ─────────────────────────────────────────────────────────── */
 .securityList { display:flex; flex-direction:column; }
 .securityRow {
   display:flex; align-items:center; justify-content:space-between;
@@ -82,7 +82,6 @@
 .securityRowDanger .securityLabel { color:var(--color-error); }
 .securitySub { font-size:0.72rem; color:var(--color-text-muted); margin-top:2px; }
 .securityChevron { color:var(--color-text-faint); flex-shrink:0; transition:transform 0.22s ease; }
-/* ChevronRight rows: rotate 90deg when open */
 .securityChevronOpen { transform:rotate(90deg); }
 .securityRow:disabled { opacity:0.55; cursor:not-allowed; }
 
@@ -113,53 +112,56 @@
 .sessionRevokeBtn:disabled { opacity:0.5; cursor:not-allowed; }
 
 /*
-  ── Change-password animated wrapper ──────────────────────────────────────────
-  Hidden state : max-height 0, opacity 0, shifted UP by 12px, no pointer events
-  Open  state  : max-height large enough, opacity 1, no shift
-  The section has overflow:hidden which clips it during animation.
-  We must NOT put overflow:hidden on the section itself — it's already there
-  via the Section component's .section class.
+  ── Change-password animated wrapper
+  Sits between Change Password row and Active Sessions row.
+  Hidden: max-height 0, opacity 0, slide up.
+  Open:   max-height large, opacity 1, no shift.
 */
 .pwdFormWrap {
   max-height: 0;
   opacity: 0;
-  transform: translateY(-12px);
+  transform: translateY(-10px);
   overflow: hidden;
   pointer-events: none;
   transition:
     max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity    0.28s ease,
-    transform  0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity    0.26s ease,
+    transform  0.30s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .pwdFormWrapOpen {
-  max-height: 600px;   /* generous ceiling — actual height is auto */
+  max-height: 620px;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
   transition:
     max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity    0.28s ease 0.04s,
-    transform  0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity    0.26s ease 0.05s,
+    transform  0.30s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Password form — left/right split ─────────────────────────────────────── */
+/* ── Password form — left inputs / right requirements ───────────────────────── */
 .pwdForm {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* left: inputs  |  right: rules */
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-4) var(--space-6);
   padding: var(--space-5);
   border-top: 1px solid var(--color-divider);
+  border-bottom: 1px solid var(--color-divider);
   background: var(--color-surface-2);
 }
 
-/* Left column — 3 stacked inputs */
+/* Left: 3 stacked inputs */
 .pwdLeft {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-/* Right column — requirements panel */
+/*
+  Right: requirements panel
+  Default: invisible (opacity 0, slight shift, no pointer-events)
+  .pwdRightVisible: fades/slides in
+*/
 .pwdRight {
   display: flex;
   flex-direction: column;
@@ -170,7 +172,17 @@
   border: 1px solid var(--color-border);
   border-radius: 12px;
   align-self: start;
-  margin-top: 20px; /* visually align with second input */
+  margin-top: 20px;
+  /* Hidden by default */
+  opacity: 0;
+  transform: translateX(8px);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.pwdRightVisible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
 }
 .pwdRightTitle {
   font-size: 0.7rem;
@@ -191,12 +203,12 @@
   border-top: 1px solid var(--color-divider);
 }
 
-/* ── Password strength bar ────────────────────────────────────────────────── */
+/* ── Strength bar ──────────────────────────────────────────────────────────── */
 .strengthBarTrack { height:4px; background:var(--color-border); border-radius:99px; overflow:hidden; }
 .strengthBarFill  { height:100%; border-radius:99px; transition:width 0.3s ease, background 0.3s ease; }
 .strengthText     { font-size:0.72rem; color:var(--color-text-muted); margin:0; }
 
-/* ── Password rules list ──────────────────────────────────────────────────── */
+/* ── Password rules list ─────────────────────────────────────────────────── */
 .pwRuleList  { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
 .pwRule      { display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--color-text-faint); }
 .pwRulePassed { color:#4ade80; }
@@ -231,7 +243,7 @@
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
   .pwdForm { grid-template-columns: 1fr; }
-  .pwdRight { margin-top: 0; }
+  .pwdRight { margin-top: 0; transform: none !important; }
 }
 @media (max-width: 640px) {
   .heroBody { padding:0 var(--space-4) var(--space-4); }
