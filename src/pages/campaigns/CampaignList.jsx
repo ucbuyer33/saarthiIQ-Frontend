@@ -110,7 +110,7 @@ export default function CampaignList() {
 function CampaignCard({ campaign: c, role, deletingId, onDelete }) {
   const status = c.status || 'Scheduled'
   const cfg    = STATUS_CONFIG[status] || STATUS_CONFIG.Scheduled
-  const preview = c.message?.slice(0, 100) + (c.message?.length > 100 ? '\u2026' : '')
+  const preview = c.message?.slice(0, 100) + (c.message?.length > 100 ? '' : '')
 
   return (
     <div className={styles.card}>
