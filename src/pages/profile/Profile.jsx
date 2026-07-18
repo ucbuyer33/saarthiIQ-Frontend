@@ -192,7 +192,7 @@ function SessionRow({ session, onRevoke, revoking }) {
             {ts && <span> &middot; {new Date(ts).toLocaleDateString()}</span>}
           </p>
           {session.user_agent && (
-            <p className={styles.sessionUA}>{session.user_agent.slice(0, 80)}{session.user_agent.length > 80 ? '\u2026' : ''}</p>
+            <p className={styles.sessionUA}>{session.user_agent.slice(0, 80)}{session.user_agent.length > 80 ? '' : ''}</p>
           )}
         </div>
       </div>
@@ -602,7 +602,7 @@ export default function Profile() {
             <div className={styles.editActions}>
               <button type="button" className={styles.cancelBtn} onClick={() => setPwdOpen(false)}>Cancel</button>
               <button type="submit" className={styles.saveBtn} disabled={pwdSaving}>
-                {pwdSaving ? <><Spinner size={13}/> Saving\u2026</> : <><Lock size={13}/> Update Password</>}
+                {pwdSaving ? <><Spinner size={13}/> Saving</> : <><Lock size={13}/> Update Password</>}
               </button>
             </div>
           </form>
@@ -647,7 +647,7 @@ export default function Profile() {
           <div className={styles.editActions}>
             <button type="button" className={styles.cancelBtn} onClick={() => setEditOpen(false)}>Cancel</button>
             <button type="submit" className={styles.saveBtn} disabled={saving}>
-              {saving ? <><Spinner size={13}/> Saving\u2026</> : <><Save size={13}/> Save Changes</>}
+              {saving ? <><Spinner size={13}/> Saving</> : <><Save size={13}/> Save Changes</>}
             </button>
           </div>
         </form>
