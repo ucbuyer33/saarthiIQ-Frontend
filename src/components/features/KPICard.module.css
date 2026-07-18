@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════════════
+   KPI CARD
+═══════════════════════════════════════════════════ */
+
+.kpi {
+  padding: var(--space-5);
+  background: var(--kpi-bg);
+  border: 1px solid var(--kpi-border);
+  border-radius: var(--radius-xl);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+  cursor: default;
+}
+
+.kpi:hover {
+  border-color: rgba(99,102,241,0.2);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.label {
+  font-size: var(--text-sm);
+  color: var(--kpi-label);
+  font-weight: 500;
+  margin-bottom: var(--space-2);
+  white-space: nowrap;
+}
+
+.value {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--kpi-value);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.iconBox {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.trend {
+  font-size: var(--text-xs);
+  margin-top: var(--space-3);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
