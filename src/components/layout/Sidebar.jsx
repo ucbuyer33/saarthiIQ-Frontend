@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, FileText, TrendingUp, Brain,
   Calendar, Megaphone, CheckSquare, BarChart2,
-  UserCog, Shield, Settings, ChevronLeft, ChevronRight,
+  UserCog, Shield, Settings,
   PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
@@ -16,7 +16,6 @@ const ICONS = {
   UserCog, Shield, Settings,
 }
 
-// Group nav items by section
 const SECTION_ORDER = ['Main', 'Recruitment', 'Tools', 'Admin']
 
 function groupItems(items) {
@@ -34,6 +33,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
   const visibleItems = NAV_ITEMS.filter(item => item.roles.includes(role))
   const groups = groupItems(visibleItems)
 
+  // Only close mobile sidebar when a nav link is actually clicked
   const handleNavClick = () => {
     if (window.innerWidth <= 768) onCloseMobile?.()
   }
@@ -43,9 +43,10 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
       className={styles.sidebar}
       data-collapsed={collapsed}
       data-mobile-open={mobileOpen}
-      onClick={onCloseMobile}
+      aria-label="Sidebar navigation"
     >
-      <div className={styles.inner} onClick={e => e.stopPropagation()}>
+      {/* NO onClick on <aside> — overlay in AppShell handles outside-tap */}
+      <div className={styles.inner}>
 
         {/* Brand */}
         <button
@@ -96,7 +97,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
           ))}
         </nav>
 
-        {/* Collapse toggle */}
+        {/* Collapse toggle — desktop only */}
         <button
           className={styles.collapseBtn}
           onClick={onCollapse}
