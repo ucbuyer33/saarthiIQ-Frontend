@@ -197,9 +197,13 @@ function SessionsPanel() {
     setLoading(true)
     try {
       const res = await sessionsAPI.getAll()
-      setSessions(res.data?.data || res.data?.results || res.data || [])
-    } catch { setSessions([]) }
-    finally { setLoading(false) }
+      const list = Array.isArray(res.data) ? res.data : (res.data?.data || res.data?.results || [])
+      setSessions(list)
+    } catch {
+      setSessions([])
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => { load() }, [load])
