@@ -1,142 +1,116 @@
+// src/pages/analytics/Analytics.jsx
 import { useEffect, useState } from 'react'
+import { BarChart2, Users, CalendarClock, CheckSquare, Megaphone, UserCheck, TrendingUp } from 'lucide-react'
 import { dashboardAPI } from '@/lib/api'
-import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
+import styles from './Analytics.module.css'
 
-function formatLabel(key) {
-  return key.replace(/_/g, ' ')
+const STAT_ICONS = {
+  total_candidates: Users,
+  total_users: UserCheck,
+  total_interviews: CalendarClock,
+  total_tasks: CheckSquare,
+  total_campaigns: Megaphone,
 }
 
-function renderValue(value) {
-  if (typeof value === 'number' || typeof value === 'string') {
-    return (
-      <p
-        style={{
-          fontSize: 'var(--text-2xl)',
-          fontWeight: 700,
-          color: 'var(--color-text)',
-          fontVariantNumeric: 'tabular-nums',
-          marginTop: 'var(--space-1)',
-        }}
-      >
-        {value}
-      </p>
-    )
-  }
+const STAT_GRADIENTS = [
+  'linear-gradient(135deg,#6366f1,#4f46e5)',
+  'linear-gradient(135deg,#0891b2,#0e7490)',
+  'linear-gradient(135deg,#16a34a,#15803d)',
+  'linear-gradient(135deg,#d97706,#b45309)',
+  'linear-gradient(135deg,#7c3aed,#6d28d9)',
+]
 
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return (
-      <div
-        style={{
-          marginTop: 'var(--space-3)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--space-2)',
-        }}
-      >
-        {Object.entries(value).map(([k, v]) => (
-          <div
-            key={k}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 'var(--space-3)',
-              padding: 'var(--space-2) 0',
-              borderBottom: '1px solid var(--color-border)',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 'var(--text-sm)',
-                color: 'var(--color-text-muted)',
-              }}
-            >
-              {formatLabel(k)}
-            </span>
-            <span
-              style={{
-                fontSize: 'var(--text-base)',
-                fontWeight: 600,
-                color: 'var(--color-text)',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {String(v)}
-            </span>
-          </div>
-        ))}
-      </div>
-    )
-  }
+const STATUS_COLORS = {
+  applied:      { color:'#6366f1', bg:'rgba(99,102,241,0.12)' },
+  interviewing: { color:'#d97706', bg:'rgba(217,119,6,0.12)'  },
+  shortlisted:  { color:'#0891b2', bg:'rgba(8,145,178,0.12)'  },
+  rejected:     { color:'#dc2626', bg:'rgba(220,38,38,0.12)'  },
+  offered:      { color:'#16a34a', bg:'rgba(22,163,74,0.12)'  },
+}
 
-  return (
-    <pre
-      style={{
-        marginTop: 'var(--space-2)',
-        padding: 'var(--space-3)',
-        borderRadius: 'var(--radius-md)',
-        background: 'var(--color-surface-offset)',
-        overflowX: 'auto',
-        fontSize: 'var(--text-xs)',
-        color: 'var(--color-text)',
-      }}
-    >
-      {JSON.stringify(value, null, 2)}
-    </pre>
-  )
+function formatLabel(key) {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 export default function Analytics() {
-  const [data, setData] = useState(null)
+  const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    dashboardAPI
-      .getAnalytics()
-      .then((r) => setData(r.data))
-      .catch((err) => {
-        console.error('Failed to load analytics', err)
-        setData(null)
-      })
+    dashboardAPI.getAnalytics()
+      .then(r => setData(r.data))
+      .catch(() => setData(null))
       .finally(() => setLoading(false))
   }, [])
 
-  return (
-    <div>
-      <PageHeader
-        title="Analytics"
-        subtitle="Hiring pipeline trends and performance metrics"
-      />
+  if (loading) return <div className={styles.loadingWrap}><Spinner size={28} /></div>
 
-      {loading ? (
-        <Spinner size={24} />
-      ) : data ? (
-        <div
-          style={{
-            display: 'grid',
-            gap: 'var(--space-4)',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          }}
-        >
-          {Object.entries(data).map(([key, value]) => (
-            <div key={key} className="card" style={{ padding: 'var(--space-5)' }}>
-              <p
-                style={{
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--color-text-muted)',
-                  fontWeight: 500,
-                  textTransform: 'capitalize',
-                }}
-              >
-                {formatLabel(key)}
-              </p>
-              {renderValue(value)}
+  // Split numeric stats from nested objects
+  const statEntries    = data ? Object.entries(data).filter(([, v]) => typeof v === 'number') : []
+  const breakdownEntries = data ? Object.entries(data).filter(([, v]) => v && typeof v === 'object' && !Array.isArray(v)) : []
+
+  return (
+    <div className={styles.page}>
+
+      {/* Header */}
+      <div className={styles.pageHeader}>
+        <div className={styles.headerIcon}><BarChart2 size={20}/></div>
+        <div>
+          <h1 className={styles.pageTitle}>Analytics</h1>
+          <p className={styles.pageSubtitle}>Hiring pipeline trends and performance metrics</p>
+        </div>
+      </div>
+
+      {!data ? (
+        <div className={styles.emptyMsg}>No analytics data available yet.</div>
+      ) : (
+        <>
+          {/* Stat cards */}
+          {statEntries.length > 0 && (
+            <div className={styles.statGrid}>
+              {statEntries.map(([key, value], i) => {
+                const Icon = STAT_ICONS[key] || TrendingUp
+                const gradient = STAT_GRADIENTS[i % STAT_GRADIENTS.length]
+                return (
+                  <div key={key} className={styles.statCard}>
+                    <div className={styles.statIcon} style={{ background: gradient }}><Icon size={16}/></div>
+                    <div>
+                      <p className={styles.statLabel}>{formatLabel(key)}</p>
+                      <p className={styles.statValue}>{value}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Breakdown sections */}
+          {breakdownEntries.map(([key, obj]) => (
+            <div key={key} className={styles.breakdown}>
+              <div className={styles.breakdownHeader}>
+                <TrendingUp size={14}/>
+                <span>{formatLabel(key)}</span>
+              </div>
+              <div className={styles.breakdownRows}>
+                {Object.entries(obj).map(([k, v]) => {
+                  const cfg = STATUS_COLORS[k.toLowerCase()] || { color:'var(--color-text-muted)', bg:'var(--color-surface-offset)' }
+                  const total = Object.values(obj).reduce((a, b) => a + Number(b), 0)
+                  const pct   = total > 0 ? Math.round((Number(v) / total) * 100) : 0
+                  return (
+                    <div key={k} className={styles.breakdownRow}>
+                      <span className={styles.breakdownKey} style={{ color: cfg.color }}>{formatLabel(k)}</span>
+                      <div className={styles.breakdownBarWrap}>
+                        <div className={styles.breakdownBar} style={{ width: `${pct}%`, background: cfg.color }} />
+                      </div>
+                      <span className={styles.breakdownVal}>{v}</span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           ))}
-        </div>
-      ) : (
-        <p className="text-muted">No analytics data available yet.</p>
+        </>
       )}
     </div>
   )
