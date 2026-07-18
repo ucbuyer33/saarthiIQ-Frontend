@@ -33,7 +33,6 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
   const visibleItems = NAV_ITEMS.filter(item => item.roles.includes(role))
   const groups = groupItems(visibleItems)
 
-  // Only close mobile sidebar when a nav link is actually clicked
   const handleNavClick = () => {
     if (window.innerWidth <= 768) onCloseMobile?.()
   }
@@ -45,7 +44,6 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
       data-mobile-open={mobileOpen}
       aria-label="Sidebar navigation"
     >
-      {/* NO onClick on <aside> — overlay in AppShell handles outside-tap */}
       <div className={styles.inner}>
 
         {/* Brand */}
@@ -73,7 +71,8 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
         <nav className={styles.nav}>
           {groups.map(group => (
             <div key={group.label}>
-              {!collapsed && (
+              {/* Hide label for 'Main' — no visual clutter for the top group */}
+              {!collapsed && group.label !== 'Main' && (
                 <p className={styles.navSection}>{group.label}</p>
               )}
               {group.items.map(item => {
