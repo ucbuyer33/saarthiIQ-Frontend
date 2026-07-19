@@ -15,19 +15,19 @@ const AVATARS = [
 ]
 
 const PW_RULES = [
-  { key: 'len',     label: 'At least 8 characters',    test: p => p.length >= 8 },
-  { key: 'upper',   label: 'Contains uppercase letter', test: p => /[A-Z]/.test(p) },
-  { key: 'lower',   label: 'Contains lowercase letter', test: p => /[a-z]/.test(p) },
-  { key: 'number',  label: 'Contains number',           test: p => /[0-9]/.test(p) },
-  { key: 'special', label: 'Contains special character',test: p => /[^A-Za-z0-9]/.test(p) },
+  { key: 'len', label: 'At least 8 characters', test: p => p.length >= 8 },
+  { key: 'upper', label: 'Contains uppercase letter', test: p => /[A-Z]/.test(p) },
+  { key: 'lower', label: 'Contains lowercase letter', test: p => /[a-z]/.test(p) },
+  { key: 'number', label: 'Contains number', test: p => /[0-9]/.test(p) },
+  { key: 'special', label: 'Contains special character', test: p => /[^A-Za-z0-9]/.test(p) },
 ]
 
 const STRENGTH_META = [
-  { label: 'Very Weak', color: '#ef4444', pct: '20%'  },
-  { label: 'Weak',      color: '#ef4444', pct: '20%'  },
-  { label: 'Fair',      color: '#f59e0b', pct: '50%'  },
-  { label: 'Good',      color: '#4db6bc', pct: '75%'  },
-  { label: 'Strong',    color: '#4ade80', pct: '100%' },
+  { label: 'Very Weak', color: '#ef4444', pct: '20%' },
+  { label: 'Weak', color: '#ef4444', pct: '20%' },
+  { label: 'Fair', color: '#f59e0b', pct: '50%' },
+  { label: 'Good', color: '#4db6bc', pct: '75%' },
+  { label: 'Strong', color: '#4ade80', pct: '100%' },
 ]
 
 function getStrength(pw) {
@@ -40,16 +40,16 @@ export default function Register() {
   const [form, setForm] = useState({
     full_name: '', email: '', password: '', confirm: '', role: 'user',
   })
-  const [showPw, setShowPw]           = useState(false)
+  const [showPw, setShowPw] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [loading, setLoading]         = useState(false)
-  const [error, setError]             = useState('')
-  const [pwFocused, setPwFocused]     = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [pwFocused, setPwFocused] = useState(false)
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   const strengthIdx = getStrength(form.password)
-  const pwsMatch    = form.confirm && form.password === form.confirm
+  const pwsMatch = form.confirm && form.password === form.confirm
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -59,12 +59,19 @@ export default function Register() {
     try {
       await authAPI.register({
         full_name: form.full_name,
-        email:     form.email,
-        password:  form.password,
-        role:      form.role,
+        email: form.email,
+        password: form.password,
+        role: form.role,
       })
-      toast.success('Account created! Please sign in.')
+
+      const userId = res.data?.user_id
+      if (userId) {
+        toast.success(`Account created! Your ID: ${userId}`)
+      } else {
+        toast.success('Account created! Please sign in.')
+      }
       navigate('/login')
+      
     } catch (err) {
       setError(err.response?.data?.detail || 'Registration failed')
     } finally {
@@ -85,9 +92,9 @@ export default function Register() {
           <div className={styles.leftLogo}>
             <div className={styles.logoIcon} aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none" width="36" height="36">
-                <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="16" cy="10" r="2" fill="white"/>
-                <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="16" cy="10" r="2" fill="white" />
+                <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
             </div>
             <div className={styles.logoMeta}>
@@ -315,7 +322,7 @@ export default function Register() {
                   height="14"
                   aria-hidden="true"
                 >
-                  <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
             </div>

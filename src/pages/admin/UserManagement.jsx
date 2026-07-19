@@ -1,3 +1,4 @@
+// saarthiIQ-Frontend\src\pages\admin\UserManagement.jsx
 import { useEffect, useState } from 'react'
 import { usersAPI } from '@/lib/api'
 import PageHeader from '@/components/ui/PageHeader'
@@ -8,11 +9,11 @@ import EmptyState from '@/components/ui/EmptyState'
 import { UserCog } from 'lucide-react'
 
 export default function UserManagement() {
-  const [users, setUsers]   = useState([])
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    usersAPI.getAll().then(r => setUsers(r.data || [])).catch(() => {}).finally(() => setLoading(false))
+    usersAPI.getAll().then(r => setUsers(r.data || [])).catch(() => { }).finally(() => setLoading(false))
   }, [])
 
   return (
@@ -25,7 +26,7 @@ export default function UserManagement() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface-2)' }}>
-                {['User', 'Email', 'Role', 'Joined'].map(h => (
+                {['User ID', 'User', 'Email', 'Role', 'Joined'].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
               </tr>
@@ -33,6 +34,9 @@ export default function UserManagement() {
             <tbody>
               {users.map(u => (
                 <tr key={u.id} style={{ borderBottom: '1px solid var(--color-divider)' }}>
+                  <td style={{ padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+                    {u.user_id || '—'}
+                  </td>
                   <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                       <Avatar name={u.full_name} size={32} />
