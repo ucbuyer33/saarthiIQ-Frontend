@@ -84,7 +84,7 @@ export default function Register() {
         <header className={styles.leftHeader}>
           <div className={styles.leftLogo}>
             <div className={styles.logoIcon} aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" width="18" height="18">
+              <svg viewBox="0 0 32 32" fill="none" width="36" height="36">
                 <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="16" cy="10" r="2" fill="white"/>
                 <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>

@@ -26,18 +26,24 @@ export default function ForgotPassword() {
         <div className={styles.leftGlow2} />
         <div className={styles.leftGlow3} />
 
-        <div className={styles.leftHeader}>
+        <header className={styles.leftHeader}>
           <div className={styles.leftLogo}>
-            <div className={styles.logoIcon}><ShieldCheck size={18} strokeWidth={2.2} /></div>
+            <div className={styles.logoIcon} aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none" width="36" height="36">
+                <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="16" cy="10" r="2" fill="white"/>
+                <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+              </svg>
+            </div>
             <div className={styles.logoMeta}>
-              <div className={styles.leftLogoText}>SaarthiIQ</div>
-              <div className={styles.leftLogoSub}>Talent OS</div>
+              <span className={styles.leftLogoText}>SaarthiIQ</span>
+              <span className={styles.leftLogoSub}>AI LEARNING PLATFORM</span>
             </div>
           </div>
-        </div>
+        </header>
 
         <div className={styles.leftContent}>
-          <div className={styles.leftTag}><Sparkles size={12} /> Account Recovery</div>
+          <div className={styles.leftTag}><ShieldCheck size={16} /> Account Recovery</div>
           <h1 className={styles.leftHeading}>
             Reset your <span className={styles.leftHeadingAccent}> password</span>.
           </h1>
