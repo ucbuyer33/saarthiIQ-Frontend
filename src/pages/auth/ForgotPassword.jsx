@@ -1,3 +1,4 @@
+// saarthiIQ-Frontend\src\pages\auth\ForgotPassword.jsx
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Mail, ShieldCheck, Sparkles, KeyRound, CheckCircle2, Eye, EyeOff } from 'lucide-react'
