@@ -62,13 +62,14 @@ function StatCard({ label, value }) {
   return (
     <div className={styles.statCard}>
       <div className={styles.statIcon} style={{ background: meta.gradient }}><Icon size={15} /></div>
-      <div>
+      <div style={{ minWidth: 0, flex: 1 }}>
         <p className={styles.statLabel}>{label}</p>
         <p className={styles.statValue}>{value ?? '\u2014'}</p>
       </div>
     </div>
   )
 }
+
 
 function Section({ title, icon: Icon, children }) {
   return (

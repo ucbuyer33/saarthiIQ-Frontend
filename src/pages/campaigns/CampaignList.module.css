@@ -9,12 +9,12 @@
 .addBtn {
   display:inline-flex; align-items:center; gap:6px;
   padding:9px 16px; border-radius:10px; border:none;
-  background: linear-gradient(135deg,#0891b2,#0e7490);color:#fff;
+  background:linear-gradient(135deg,#0891b2,#0e7490); color:#fff;
   font-size:var(--text-sm); font-weight:600; font-family:var(--font-body);
   cursor:pointer; white-space:nowrap; flex-shrink:0;
   transition:filter var(--transition-fast),box-shadow var(--transition-fast),transform var(--transition-fast);
 }
-.addBtn:hover { filter:brightness(1.08); box-shadow:0 4px 14px rgba(217,119,6,0.35); transform:translateY(-1px); }
+.addBtn:hover { filter:brightness(1.08); box-shadow:0 4px 14px rgba(8,145,178,0.35); transform:translateY(-1px); }
 
 /* Grid */
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:var(--space-4); }
@@ -37,7 +37,7 @@
 .cardTop { display:flex; align-items:center; justify-content:space-between; }
 .cardIconWrap {
   width:34px; height:34px; border-radius:10px;
-  background:rgba(217,119,6,0.1); color:#d97706;
+  background:rgba(217,119,6,0.1); color:#0891b2;
   display:flex; align-items:center; justify-content:center;
 }
 .statusBadge {

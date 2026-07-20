@@ -53,7 +53,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
           aria-label="Toggle sidebar"
         >
           <div className={styles.logoIconWrap}>
-            <svg viewBox="0 0 32 32" fill="none" width="18" height="18">
+            <svg viewBox="0 0 32 32" fill="none" width="30" height="30">
               <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx="16" cy="10" r="2" fill="white" />
               <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
