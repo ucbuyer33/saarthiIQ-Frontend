@@ -1,5 +1,5 @@
 // saarthiIQ-Frontend\src\pages\auth\Register.jsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, AlertCircle, Check, ArrowRight } from 'lucide-react'
 import { authAPI } from '@/lib/api'
@@ -45,7 +45,25 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [pwFocused, setPwFocused] = useState(false)
+  const [showStrength, setShowStrength] = useState(false)
 
+  // Show when focused or has text
+  useEffect(() => {
+    if (pwFocused || form.password.length > 0) {
+      setShowStrength(true)
+    } else {
+      setShowStrength(false)
+    }
+  }, [pwFocused, form.password])
+
+  // Auto-collapse after 0.1s when all rules pass
+  useEffect(() => {
+    const allPassed = PW_RULES.every(r => r.test(form.password))
+    if (allPassed && form.password.length > 0 && !pwFocused) {
+      const t = setTimeout(() => setShowStrength(false), 100)
+      return () => clearTimeout(t)
+    }
+  }, [form.password, pwFocused])
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   const strengthIdx = getStrength(form.password)
@@ -160,7 +178,7 @@ export default function Register() {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h2 className={styles.title}>Create account</h2>
-            <p className={styles.subtitle}>Join your team on SaarthiIQ.</p>
+            <p className={styles.subtitle}>Join 50,000+ learners on SaarthiIQ.</p>
           </div>
 
           {error && (
@@ -231,9 +249,8 @@ export default function Register() {
               </div>
 
               {/* Strength UI — shows when typing */}
-              {(form.password || pwFocused) && (
+              <div className={`${styles.strengthWrap} ${showStrength ? styles.strengthOpen : styles.strengthClosed}`}>
                 <div className={styles.strengthPanel}>
-                  {/* Bar */}
                   <div className={styles.strengthBarTrack}>
                     <div
                       className={styles.strengthBarFill}
@@ -244,7 +261,6 @@ export default function Register() {
                     />
                   </div>
 
-                  {/* Label */}
                   {strengthIdx >= 0 && (
                     <p className={styles.strengthText}>
                       Password strength:{' '}
@@ -254,15 +270,11 @@ export default function Register() {
                     </p>
                   )}
 
-                  {/* Checklist */}
                   <ul className={styles.pwRuleList} aria-label="Password requirements">
                     {PW_RULES.map(rule => {
                       const passed = form.password && rule.test(form.password)
                       return (
-                        <li
-                          key={rule.key}
-                          className={`${styles.pwRule} ${passed ? styles.pwRulePassed : ''}`}
-                        >
+                        <li key={rule.key} className={`${styles.pwRule} ${passed ? styles.pwRulePassed : ''}`}>
                           <span className={styles.pwRuleIcon} aria-hidden="true">
                             <Check size={10} strokeWidth={3} />
                           </span>
@@ -272,7 +284,8 @@ export default function Register() {
                     })}
                   </ul>
                 </div>
-              )}
+              </div>
+
             </div>
 
             {/* Confirm Password */}

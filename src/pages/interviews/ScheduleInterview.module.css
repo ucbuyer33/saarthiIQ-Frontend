@@ -1,3 +1,4 @@
+/* saarthiIQ-Frontend\src\pages\interviews\ScheduleInterview.module.css */
 /* SCHEDULE INTERVIEW */
 .page { display:flex; flex-direction:column; gap:var(--space-6); max-width:900px; }
 .pageHeader { display:flex; align-items:center; gap:var(--space-3); }
