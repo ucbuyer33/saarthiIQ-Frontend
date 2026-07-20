@@ -51,32 +51,40 @@ export default function Register() {
   const strengthIdx = getStrength(form.password)
   const pwsMatch = form.confirm && form.password === form.confirm
 
-const handleSubmit = async (e) => {
-  e.preventDefault()
-  if (form.password !== form.confirm) { setError('Passwords do not match'); return }
-  setLoading(true)
-  setError('')
-  try {
-    const res = await authAPI.register({
-      full_name: form.full_name,
-      email: form.email,
-      password: form.password,
-      role: form.role,
-    })
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (form.password !== form.confirm) { setError('Passwords do not match'); return }
+    setLoading(true)
+    setError('')
+    try {
+      const res = await authAPI.register({
+        full_name: form.full_name,
+        email: form.email,
+        password: form.password,
+        role: form.role,
+      })
 
-    const userId = res.data?.user_id
-    if (userId) {
-      toast.success(`Account created! Your ID: ${userId}`)
-    } else {
-      toast.success('Account created! Please sign in.')
+      console.log('Register response:', res)  // ← Debug log
+
+      // Handle different response structures
+      const userId = res?.data?.user_id || res?.user_id
+
+      if (userId) {
+        toast.success(`Account created! Your ID: ${userId}`)
+      } else {
+        toast.success('Account created! Please sign in.')
+      }
+
+      // Small delay to let toast show
+      setTimeout(() => navigate('/login'), 1500)
+    } catch (err) {
+      console.error('Registration error:', err)
+      console.error('Error response:', err.response)
+      setError(err.response?.data?.detail || 'Registration failed')
+    } finally {
+      setLoading(false)
     }
-    navigate('/login')
-  } catch (err) {
-    setError(err.response?.data?.detail || 'Registration failed')
-  } finally {
-    setLoading(false)
   }
-}
 
   return (
     <div className={styles.page}>
