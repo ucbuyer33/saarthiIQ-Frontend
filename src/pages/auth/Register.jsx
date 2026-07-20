@@ -64,22 +64,22 @@ export default function Register() {
         role: form.role,
       })
 
-      console.log('Register response:', res)  // ← Debug log
-
-      // Handle different response structures
-      const userId = res?.data?.user_id || res?.user_id
+      const userId = res.data?.user_id
 
       if (userId) {
         toast.success(`Account created! Your ID: ${userId}`)
+        // Wait a bit before navigating so user sees the toast
+        setTimeout(() => {
+          navigate('/login')
+        }, 2000)
       } else {
         toast.success('Account created! Please sign in.')
+        setTimeout(() => {
+          navigate('/login')
+        }, 1500)
       }
-
-      // Small delay to let toast show
-      setTimeout(() => navigate('/login'), 1500)
     } catch (err) {
       console.error('Registration error:', err)
-      console.error('Error response:', err.response)
       setError(err.response?.data?.detail || 'Registration failed')
     } finally {
       setLoading(false)
