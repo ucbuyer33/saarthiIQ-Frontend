@@ -1,11 +1,11 @@
-// saarthiIQ-Frontend\src\pages\admin\AuditLog.jsx
+// saarthiIQ-Frontend\src\pages\activity\ActivityLog.jsx
 import { useEffect, useState } from 'react'
 import { auditAPI } from '@/lib/api'
 import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import { ClipboardList } from 'lucide-react'
 
-export default function AuditLog() {
+export default function ActivityLog() {
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -14,7 +14,7 @@ export default function AuditLog() {
       .getAll({ page: 1, limit: 50 })
       .then((r) => setLogs(r.data?.results || []))
       .catch((err) => {
-        console.error('Failed to load audit logs', err)
+        console.error('Failed to load activity logs', err)
         setLogs([])
       })
       .finally(() => setLoading(false))
@@ -23,8 +23,8 @@ export default function AuditLog() {
   return (
     <div>
       <PageHeader
-        title="Audit Log"
-        subtitle="Track all actions performed in the system"
+        title="Activity Log"
+        subtitle="Track your recent actions in the system"
         icon={ClipboardList}
         iconColor="linear-gradient(135deg,#d97706,#b45309)"
       />
@@ -71,7 +71,7 @@ export default function AuditLog() {
                       fontSize: 'var(--text-sm)',
                     }}
                   >
-                    No audit records yet.
+                    No activity records yet.
                   </td>
                 </tr>
               ) : (

@@ -1,6 +1,6 @@
 // saarthiIQ-Frontend\src\context\AuthContext.jsx
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { getToken, saveToken, clearToken, decodeToken, isTokenExpired } from '@/lib/auth'
+import { getToken, saveToken, clearToken, isTokenExpired } from '@/lib/auth'
 import { usersAPI } from '@/lib/api'
 
 const AuthContext = createContext(null)
@@ -8,28 +8,21 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(() => getToken())
-  const [role, setRole] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const logout = useCallback(() => {
     clearToken()
     setToken(null)
     setUser(null)
-    setRole(null)
     setLoading(false)
   }, [])
 
-  const loadUser = useCallback(async (tkn) => {
+  const loadUser = useCallback(async () => {
     try {
       const res = await usersAPI.getMe()
       const data = res.data?.data || res.data
       setUser(data)
-
-      const decoded = decodeToken(tkn)
-      const resolvedRole = data?.role || decoded?.role || 'user'
-      setRole(resolvedRole)
-
-      return resolvedRole
+      return data
     } catch {
       logout()
       return null
@@ -42,7 +35,7 @@ export function AuthProvider({ children }) {
     const tkn = getToken()
     if (tkn && !isTokenExpired(tkn)) {
       setToken(tkn)
-      loadUser(tkn)
+      loadUser()
     } else {
       clearToken()
       setLoading(false)
@@ -52,15 +45,14 @@ export function AuthProvider({ children }) {
   const login = async (tokenStr) => {
     saveToken(tokenStr)
     setToken(tokenStr)
-    const resolvedRole = await loadUser(tokenStr)
-    return resolvedRole
+    const loadedUser = await loadUser()
+    return loadedUser
   }
 
-  const hasRole = (...roles) => roles.includes(role)
   const isAuth = !!token && !isTokenExpired(token)
 
   return (
-    <AuthContext.Provider value={{ user, token, role, loading, isAuth, login, logout, hasRole, setUser }}>
+    <AuthContext.Provider value={{ user, token, loading, isAuth, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   )

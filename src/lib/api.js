@@ -47,14 +47,11 @@ export const authAPI = {
 }
 
 // ==================
-// USER ENDPOINTS
+// USER ENDPOINTS (single-role — self-profile only, no admin user management)
 // ==================
 export const usersAPI = {
   getMe: () => api.get('/auth/me'),
   update: (data) => api.patch('/auth/me', data),
-  getAll: () => api.get('/users'),
-  getById: (id) => api.get(`/users/${id}`),
-  delete: (id) => api.delete(`/users/${id}`),
   changePassword: (data) => api.post('/auth/change-password', data),
   logoutEverywhere: () => api.post('/auth/logout-everywhere'),
   deleteMe: () => api.delete('/auth/me'),
@@ -157,7 +154,7 @@ export const notesAPI = {
 }
 
 // ==================
-// AUDIT ENDPOINTS
+// ACTIVITY (AUDIT) ENDPOINTS
 // ==================
 export const auditAPI = {
   getAll: (params) => api.get('/audit', { params }),
