@@ -2,7 +2,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import PrivateRoute from './router/PrivateRoute'
-import RoleRoute from './router/RoleRoute'
 import AppShell from './components/layout/AppShell'
 
 // Auth pages
@@ -26,8 +25,7 @@ import CampaignList from './pages/campaigns/CampaignList'
 import CreateCampaign from './pages/campaigns/CreateCampaign'
 import TaskBoard from './pages/tasks/TaskBoard'
 import Analytics from './pages/analytics/Analytics'
-import UserManagement from './pages/admin/UserManagement'
-import AuditLog from './pages/admin/AuditLog'
+import ActivityLog from './pages/activity/ActivityLog'
 import Profile from './pages/profile/Profile'
 
 import LoadingScreen from './components/ui/LoadingScreen'
@@ -43,49 +41,32 @@ export default function App() {
       <Route path="/register"       element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Protected Routes inside AppShell */}
+      {/* Protected Routes inside AppShell — single-role (recruiter) app, no per-route RBAC */}
       <Route element={<PrivateRoute />}>
         <Route element={<AppShell />}>
           <Route path="/dashboard"      element={<Dashboard />} />
 
-          {/* Candidates — recruiter + admin */}
-          <Route element={<RoleRoute roles={['admin','recruiter']} />}>
-            <Route path="/candidates"         element={<CandidateList />} />
-            <Route path="/candidates/add"     element={<AddCandidate />} />
-            <Route path="/candidates/:id"     element={<CandidateDetail />} />
-            <Route path="/candidates/:id/edit" element={<AddCandidate />} />
-          </Route>
+          <Route path="/candidates"         element={<CandidateList />} />
+          <Route path="/candidates/add"     element={<AddCandidate />} />
+          <Route path="/candidates/:id"     element={<CandidateDetail />} />
+          <Route path="/candidates/:id/edit" element={<AddCandidate />} />
 
-          {/* Resume & AI — recruiter + admin */}
-          <Route element={<RoleRoute roles={['admin','recruiter']} />}>
-            <Route path="/resume"             element={<ResumeUpload />} />
-            <Route path="/resume/score/:id"   element={<ResumeScore />} />
-            <Route path="/resume/match/:id"   element={<JobMatch />} />
-            <Route path="/ai/skill-gap"        element={<SkillGap />} />
-            <Route path="/ai/report"           element={<AIReport />} />
-          </Route>
+          <Route path="/resume"             element={<ResumeUpload />} />
+          <Route path="/resume/score/:id"   element={<ResumeScore />} />
+          <Route path="/resume/match/:id"   element={<JobMatch />} />
+          <Route path="/ai/skill-gap"        element={<SkillGap />} />
+          <Route path="/ai/report"           element={<AIReport />} />
 
-          {/* Interviews — all except basic user */}
-          <Route element={<RoleRoute roles={['admin','recruiter','interviewer']} />}>
-            <Route path="/interviews"           element={<InterviewList />} />
-            <Route path="/interviews/schedule"  element={<ScheduleInterview />} />
-          </Route>
+          <Route path="/interviews"           element={<InterviewList />} />
+          <Route path="/interviews/schedule"  element={<ScheduleInterview />} />
 
-          {/* Campaigns & Tasks — recruiter + admin */}
-          <Route element={<RoleRoute roles={['admin','recruiter']} />}>
-            <Route path="/campaigns"            element={<CampaignList />} />
-            <Route path="/campaigns/create"     element={<CreateCampaign />} />
-            <Route path="/tasks"                element={<TaskBoard />} />
-            <Route path="/analytics"            element={<Analytics />} />
-          </Route>
+          <Route path="/campaigns"            element={<CampaignList />} />
+          <Route path="/campaigns/create"     element={<CreateCampaign />} />
+          <Route path="/tasks"                element={<TaskBoard />} />
+          <Route path="/analytics"            element={<Analytics />} />
 
-          {/* Admin only */}
-          <Route element={<RoleRoute roles={['admin']} />}>
-            <Route path="/admin/users"  element={<UserManagement />} />
-            <Route path="/admin/audit"  element={<AuditLog />} />
-          </Route>
+          <Route path="/activity"             element={<ActivityLog />} />
 
-          {/* Profile — all roles */}
           <Route path="/profile" element={<Profile />} />
 
           {/* Default redirect */}
