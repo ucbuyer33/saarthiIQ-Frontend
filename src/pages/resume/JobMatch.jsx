@@ -1,11 +1,13 @@
+// src/pages/resume/JobMatch.jsx
 import { useState } from 'react'
 import { resumeAPI } from '@/lib/api'
 import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
+import { Crosshair } from 'lucide-react'
 
 export default function JobMatch() {
-  const [form, setForm]   = useState({ resume_id: '', job_description: '' })
+  const [form, setForm]     = useState({ resume_id: '', job_description: '' })
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -20,7 +22,12 @@ export default function JobMatch() {
 
   return (
     <div style={{ maxWidth: 700 }}>
-      <PageHeader title="Job Match" subtitle="Check how well a resume matches a job description" />
+      <PageHeader
+        title="Job Match"
+        subtitle="Check how well a resume matches a job description"
+        icon={Crosshair}
+        iconColor="linear-gradient(135deg,#16a34a,#15803d)"
+      />
       <div className="card">
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div className="form-group">

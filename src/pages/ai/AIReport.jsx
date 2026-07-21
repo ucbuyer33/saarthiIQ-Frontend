@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Brain, Sparkles, Search, FileText } from 'lucide-react'
 import { aiAPI } from '@/lib/api'
+import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
 import styles from './AIPages.module.css'
@@ -28,18 +29,13 @@ export default function AIReport() {
   return (
     <div className={styles.page}>
 
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div className={styles.headerIcon} style={{ background: 'linear-gradient(135deg,#7c3aed,#6d28d9)' }}>
-          <Brain size={20} />
-        </div>
-        <div>
-          <h1 className={styles.pageTitle}>AI Candidate Report</h1>
-          <p className={styles.pageSubtitle}>Generate a comprehensive AI-powered hiring recommendation</p>
-        </div>
-      </div>
+      <PageHeader
+        title="AI Candidate Report"
+        subtitle="Generate a comprehensive AI-powered hiring recommendation"
+        icon={Brain}
+        iconColor="linear-gradient(135deg,#7c3aed,#6d28d9)"
+      />
 
-      {/* Input card */}
       <div className={styles.card}>
         <form onSubmit={generate} className={styles.searchRow}>
           <div className={styles.searchWrap}>
@@ -62,7 +58,6 @@ export default function AIReport() {
         </form>
       </div>
 
-      {/* Loading */}
       {loading && (
         <div className={styles.loadingState}>
           <Spinner size={24} />
@@ -70,7 +65,6 @@ export default function AIReport() {
         </div>
       )}
 
-      {/* Report */}
       {report && !loading && (
         <div className={styles.reportCard}>
           <div className={styles.reportHeader}>

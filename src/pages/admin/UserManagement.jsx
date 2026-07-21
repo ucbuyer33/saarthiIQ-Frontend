@@ -18,7 +18,12 @@ export default function UserManagement() {
 
   return (
     <div>
-      <PageHeader title="User Management" subtitle="Manage team members and permissions" />
+      <PageHeader
+        title="User Management"
+        subtitle="Manage team members and permissions"
+        icon={UserCog}
+        iconColor="linear-gradient(135deg,#7c3aed,#6d28d9)"
+      />
       {loading ? <Spinner size={24} /> : users.length === 0 ? (
         <EmptyState icon={UserCog} title="No users found" />
       ) : (

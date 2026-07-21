@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { auditAPI } from '@/lib/api'
 import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
+import { ClipboardList } from 'lucide-react'
 
 export default function AuditLog() {
   const [logs, setLogs] = useState([])
@@ -18,11 +19,14 @@ export default function AuditLog() {
       })
       .finally(() => setLoading(false))
   }, [])
+
   return (
     <div>
       <PageHeader
         title="Audit Log"
         subtitle="Track all actions performed in the system"
+        icon={ClipboardList}
+        iconColor="linear-gradient(135deg,#d97706,#b45309)"
       />
 
       {loading ? (
@@ -55,7 +59,6 @@ export default function AuditLog() {
                 ))}
               </tr>
             </thead>
-
             <tbody>
               {logs.length === 0 ? (
                 <tr>
@@ -86,7 +89,6 @@ export default function AuditLog() {
                     >
                       {l.action}
                     </td>
-
                     <td
                       style={{
                         padding: 'var(--space-3) var(--space-4)',
@@ -95,7 +97,6 @@ export default function AuditLog() {
                     >
                       {l.user_email || l.user_id || '—'}
                     </td>
-
                     <td
                       style={{
                         padding: 'var(--space-3) var(--space-4)',
@@ -105,7 +106,6 @@ export default function AuditLog() {
                     >
                       {l.resource || l.module || '—'}
                     </td>
-
                     <td
                       style={{
                         padding: 'var(--space-3) var(--space-4)',

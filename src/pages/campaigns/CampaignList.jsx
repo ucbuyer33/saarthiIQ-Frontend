@@ -8,6 +8,7 @@ import { campaignsAPI } from '@/lib/api'
 import EmptyState from '@/components/ui/EmptyState'
 import Spinner from '@/components/ui/Spinner'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import PageHeader from '@/components/ui/PageHeader'
 import styles from './CampaignList.module.css'
 
 const STATUS_CONFIG = {
@@ -20,10 +21,10 @@ const STATUS_CONFIG = {
 export default function CampaignList() {
   const navigate = useNavigate()
   const { role } = useAuth()
-  const [campaigns, setCampaigns]           = useState([])
-  const [loading, setLoading]               = useState(true)
-  const [deletingId, setDeletingId]         = useState(null)
-  const [confirmOpen, setConfirmOpen]       = useState(false)
+  const [campaigns, setCampaigns]               = useState([])
+  const [loading, setLoading]                   = useState(true)
+  const [deletingId, setDeletingId]             = useState(null)
+  const [confirmOpen, setConfirmOpen]           = useState(false)
   const [selectedCampaign, setSelectedCampaign] = useState(null)
 
   useEffect(() => {
@@ -52,18 +53,17 @@ export default function CampaignList() {
   return (
     <div className={styles.page}>
 
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div>
-          <h1 className={styles.pageTitle}>Campaigns</h1>
-          <p className={styles.pageSubtitle}>
-            {campaigns.length > 0 ? `${campaigns.length} campaign${campaigns.length > 1 ? 's' : ''}` : 'Outreach campaigns for candidates'}
-          </p>
-        </div>
-        <button className={styles.addBtn} onClick={() => navigate('/campaigns/create')}>
-          <Plus size={14} /> New Campaign
-        </button>
-      </div>
+      <PageHeader
+        title="Campaigns"
+        subtitle={campaigns.length > 0 ? `${campaigns.length} campaign${campaigns.length > 1 ? 's' : ''}` : 'Outreach campaigns for candidates'}
+        icon={Megaphone}
+        iconColor="linear-gradient(135deg,#dc2626,#b91c1c)"
+        actions={
+          <button className={styles.addBtn} onClick={() => navigate('/campaigns/create')}>
+            <Plus size={14} /> New Campaign
+          </button>
+        }
+      />
 
       {loading ? (
         <div className={styles.loadingWrap}><Spinner size={24} /></div>
@@ -108,40 +108,26 @@ export default function CampaignList() {
 }
 
 function CampaignCard({ campaign: c, role, deletingId, onDelete }) {
-  const status = c.status || 'Scheduled'
-  const cfg    = STATUS_CONFIG[status] || STATUS_CONFIG.Scheduled
+  const status  = c.status || 'Scheduled'
+  const cfg     = STATUS_CONFIG[status] || STATUS_CONFIG.Scheduled
   const preview = c.message?.slice(0, 100) + (c.message?.length > 100 ? '' : '')
 
   return (
     <div className={styles.card}>
-      {/* Top row */}
       <div className={styles.cardTop}>
-        <div className={styles.cardIconWrap}>
-          <Megaphone size={16} />
-        </div>
-        <span className={styles.statusBadge} style={{ color: cfg.color, background: cfg.bg }}>
-          {status}
-        </span>
+        <div className={styles.cardIconWrap}><Megaphone size={16} /></div>
+        <span className={styles.statusBadge} style={{ color: cfg.color, background: cfg.bg }}>{status}</span>
       </div>
-
-      {/* Name & subject */}
       <div className={styles.cardBody}>
         <h3 className={styles.cardName}>{c.campaign_name}</h3>
-        <div className={styles.cardMeta}>
-          <Send size={11} />
-          <span>{c.subject}</span>
-        </div>
+        <div className={styles.cardMeta}><Send size={11} /><span>{c.subject}</span></div>
       </div>
-
-      {/* Message preview */}
       {preview && (
         <div className={styles.cardPreview}>
           <AlignLeft size={11} className={styles.cardPreviewIcon} />
           <p>{preview}</p>
         </div>
       )}
-
-      {/* Footer */}
       <div className={styles.cardFooter}>
         <span className={styles.cardDate}>
           <CalendarDays size={11} />

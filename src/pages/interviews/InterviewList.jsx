@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext'
 import EmptyState from '@/components/ui/EmptyState'
 import Spinner from '@/components/ui/Spinner'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import PageHeader from '@/components/ui/PageHeader'
 import toast from 'react-hot-toast'
 import styles from './InterviewList.module.css'
 
@@ -25,11 +26,11 @@ const STATUS_CONFIG = {
 export default function InterviewList() {
   const navigate = useNavigate()
   const { role } = useAuth()
-  const [interviews, setInterviews]     = useState([])
-  const [loading, setLoading]           = useState(true)
-  const [deletingId, setDeletingId]     = useState(null)
-  const [confirmOpen, setConfirmOpen]   = useState(false)
-  const [selectedIv, setSelectedIv]     = useState(null)
+  const [interviews, setInterviews]   = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [deletingId, setDeletingId]   = useState(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [selectedIv, setSelectedIv]   = useState(null)
 
   useEffect(() => {
     interviewsAPI.getAll()
@@ -54,24 +55,23 @@ export default function InterviewList() {
     } finally { setDeletingId(null) }
   }
 
-  const upcoming  = interviews.filter(iv => iv.status !== 'Completed' && iv.status !== 'Cancelled')
-  const past      = interviews.filter(iv => iv.status === 'Completed' || iv.status === 'Cancelled')
+  const upcoming = interviews.filter(iv => iv.status !== 'Completed' && iv.status !== 'Cancelled')
+  const past     = interviews.filter(iv => iv.status === 'Completed' || iv.status === 'Cancelled')
 
   return (
     <div className={styles.page}>
 
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div>
-          <h1 className={styles.pageTitle}>Interviews</h1>
-          <p className={styles.pageSubtitle}>
-            {upcoming.length} upcoming · {past.length} past
-          </p>
-        </div>
-        <button className={styles.addBtn} onClick={() => navigate('/interviews/schedule')}>
-          <Plus size={14} /> Schedule Interview
-        </button>
-      </div>
+      <PageHeader
+        title="Interviews"
+        subtitle={`${upcoming.length} upcoming · ${past.length} past`}
+        icon={CalendarClock}
+        iconColor="linear-gradient(135deg,#0891b2,#0e7490)"
+        actions={
+          <button className={styles.addBtn} onClick={() => navigate('/interviews/schedule')}>
+            <Plus size={14} /> Schedule Interview
+          </button>
+        }
+      />
 
       {loading ? (
         <div className={styles.loadingWrap}><Spinner size={24} /></div>
@@ -88,7 +88,6 @@ export default function InterviewList() {
         />
       ) : (
         <div className={styles.lists}>
-
           {upcoming.length > 0 && (
             <div className={styles.group}>
               <p className={styles.groupLabel}>Upcoming <span>{upcoming.length}</span></p>
@@ -99,7 +98,6 @@ export default function InterviewList() {
               </div>
             </div>
           )}
-
           {past.length > 0 && (
             <div className={styles.group}>
               <p className={styles.groupLabel}>Past <span>{past.length}</span></p>
@@ -141,15 +139,11 @@ function InterviewCard({ iv, role, deletingId, onDelete }) {
 
   return (
     <div className={styles.card}>
-
-      {/* Left: date block */}
       <div className={styles.dateBlock} style={{ background: typeCfg.bg }}>
         <CalendarClock size={16} style={{ color: typeCfg.color }} />
         {dateStr && <span className={styles.dateStr} style={{ color: typeCfg.color }}>{dateStr}</span>}
         {timeStr && <span className={styles.timeStr}>{timeStr}</span>}
       </div>
-
-      {/* Center: details */}
       <div className={styles.cardContent}>
         <div className={styles.cardTopRow}>
           <span className={styles.typeBadge} style={{ color: typeCfg.color, background: typeCfg.bg }}>
@@ -171,8 +165,6 @@ function InterviewCard({ iv, role, deletingId, onDelete }) {
           )}
         </div>
       </div>
-
-      {/* Right: actions */}
       {role === 'admin' && (
         <button
           type="button"

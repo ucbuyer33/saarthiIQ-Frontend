@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { TrendingUp, CheckCircle2, XCircle, Lightbulb, Search } from 'lucide-react'
 import { aiAPI } from '@/lib/api'
+import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
 import styles from './AIPages.module.css'
@@ -28,18 +29,13 @@ export default function SkillGap() {
   return (
     <div className={styles.page}>
 
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div className={styles.headerIcon} style={{ background: 'linear-gradient(135deg,#0891b2,#0e7490)' }}>
-          <TrendingUp size={20} />
-        </div>
-        <div>
-          <h1 className={styles.pageTitle}>Skill Gap Analysis</h1>
-          <p className={styles.pageSubtitle}>AI-powered skills comparison against role requirements</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Skill Gap Analysis"
+        subtitle="AI-powered skills comparison against role requirements"
+        icon={TrendingUp}
+        iconColor="linear-gradient(135deg,#0891b2,#0e7490)"
+      />
 
-      {/* Input card */}
       <div className={styles.card}>
         <form onSubmit={analyze} className={styles.searchRow}>
           <div className={styles.searchWrap}>
@@ -58,7 +54,6 @@ export default function SkillGap() {
         </form>
       </div>
 
-      {/* Loading */}
       {loading && (
         <div className={styles.loadingState}>
           <Spinner size={24} />
@@ -66,10 +61,8 @@ export default function SkillGap() {
         </div>
       )}
 
-      {/* Results */}
       {result && !loading && (
         <div className={styles.results}>
-
           {result.matched_skills?.length > 0 && (
             <div className={styles.resultSection}>
               <div className={styles.resultSectionHeader}>
@@ -84,7 +77,6 @@ export default function SkillGap() {
               </div>
             </div>
           )}
-
           {result.missing_skills?.length > 0 && (
             <div className={styles.resultSection}>
               <div className={styles.resultSectionHeader}>
@@ -99,7 +91,6 @@ export default function SkillGap() {
               </div>
             </div>
           )}
-
           {result.recommendation && (
             <div className={styles.recommendation}>
               <Lightbulb size={15} style={{ color: '#d97706', flexShrink: 0 }} />

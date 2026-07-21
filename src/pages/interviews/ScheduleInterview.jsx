@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, CalendarClock, User, Users, Tag, Link2, CalendarCheck2 } from 'lucide-react'
 import { interviewsAPI } from '@/lib/api'
+import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
 import { INTERVIEW_TYPES } from '@/lib/constants'
@@ -58,22 +59,21 @@ export default function ScheduleInterview() {
   return (
     <div className={styles.page}>
 
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <button className={styles.backBtn} onClick={() => navigate('/interviews')} type="button">
-          <ArrowLeft size={16} />
-        </button>
-        <div className={styles.headerIcon}><CalendarClock size={20} /></div>
-        <div>
-          <h1 className={styles.pageTitle}>Schedule Interview</h1>
-          <p className={styles.pageSubtitle}>Set up an interview session for a candidate</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Schedule Interview"
+        subtitle="Set up an interview session for a candidate"
+        icon={CalendarClock}
+        iconColor="linear-gradient(135deg,#0891b2,#0e7490)"
+        actions={
+          <button className={styles.backBtn} onClick={() => navigate('/interviews')} type="button">
+            <ArrowLeft size={16} />
+          </button>
+        }
+      />
 
       <div className={styles.layout}>
         <form onSubmit={handleSubmit} className={styles.form}>
 
-          {/* Who */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}><Users size={13}/><span>Participants</span></div>
             <div className={styles.grid2}>
@@ -94,7 +94,6 @@ export default function ScheduleInterview() {
             </div>
           </div>
 
-          {/* Details */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}><Tag size={13}/><span>Interview Details</span></div>
             <div className={styles.grid2}>
@@ -131,7 +130,6 @@ export default function ScheduleInterview() {
           </div>
         </form>
 
-        {/* Preview */}
         <aside className={styles.preview}>
           <p className={styles.previewLabel}>Preview</p>
           <div className={styles.previewCard}>

@@ -6,6 +6,7 @@ import { candidatesAPI } from '@/lib/api'
 import CandidateCard from '@/components/features/CandidateCard'
 import CandidateRow from '@/components/features/CandidateRow'
 import { CANDIDATE_STATUSES } from '@/lib/constants'
+import PageHeader from '@/components/ui/PageHeader'
 import styles from './Candidates.module.css'
 
 const STATUS_TABS = [
@@ -22,7 +23,7 @@ export default function CandidateList() {
   const [loading, setLoading]         = useState(true)
   const [search, setSearch]           = useState(params.get('q') || '')
   const [statusFilter, setStatus]     = useState('')
-  const [view, setView]               = useState('grid') // 'grid' | 'list'
+  const [view, setView]               = useState('grid')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,33 +38,28 @@ export default function CandidateList() {
     return () => clearTimeout(t)
   }, [search, statusFilter])
 
-  const total       = candidates.length
-  const shortlisted = candidates.filter(c => c.status === 'shortlisted').length
+  const total        = candidates.length
+  const shortlisted  = candidates.filter(c => c.status === 'shortlisted').length
   const interviewing = candidates.filter(c => c.status === 'interviewing').length
 
   return (
     <div className={styles.page}>
 
-      {/* ── Page header ── */}
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.title}>Candidates</h1>
-          <p className={styles.subtitle}>
-            {loading ? 'Loading…' : `${total} total · ${shortlisted} shortlisted · ${interviewing} interviewing`}
-          </p>
-        </div>
-        <button
-          className={styles.addBtn}
-          onClick={() => navigate('/candidates/add')}
-        >
-          <Plus size={15} strokeWidth={2.5} />
-          Add Candidate
-        </button>
-      </div>
+      <PageHeader
+        title="Candidates"
+        subtitle={loading ? 'Loading…' : `${total} total · ${shortlisted} shortlisted · ${interviewing} interviewing`}
+        icon={Users}
+        iconColor="linear-gradient(135deg,#6366f1,#4f46e5)"
+        actions={
+          <button className={styles.addBtn} onClick={() => navigate('/candidates/add')}>
+            <Plus size={15} strokeWidth={2.5} />
+            Add Candidate
+          </button>
+        }
+      />
 
       {/* ── Status tabs + search bar ── */}
       <div className={styles.toolbar}>
-        {/* Status tabs */}
         <div className={styles.tabs}>
           {STATUS_TABS.map(tab => {
             const Icon = tab.icon
@@ -79,8 +75,6 @@ export default function CandidateList() {
             )
           })}
         </div>
-
-        {/* Right controls */}
         <div className={styles.controls}>
           <div className={styles.searchWrap}>
             <Search size={13} className={styles.searchIcon} />
@@ -94,7 +88,6 @@ export default function CandidateList() {
               <button className={styles.searchClear} onClick={() => setSearch('')}>×</button>
             )}
           </div>
-
           <select
             className={styles.statusSelect}
             value={statusFilter}
@@ -105,8 +98,6 @@ export default function CandidateList() {
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>
-
-          {/* View toggle */}
           <div className={styles.viewToggle}>
             <button
               className={`${styles.viewBtn} ${view === 'grid' ? styles.viewBtnActive : ''}`}

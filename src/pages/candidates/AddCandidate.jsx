@@ -1,8 +1,9 @@
 // src/pages/candidates/AddCandidate.jsx
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Tag, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Tag, CheckCircle2, UserPlus } from 'lucide-react'
 import { candidatesAPI } from '@/lib/api'
+import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
 import { CANDIDATE_STATUSES } from '@/lib/constants'
@@ -76,13 +77,8 @@ export default function AddCandidate() {
     } finally { setLoading(false) }
   }
 
-  // Live skill chips from the input
-  const skillChips = form.skills
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean)
-
-  const statusCfg = STATUS_CONFIG[form.status] || STATUS_CONFIG.applied
+  const skillChips = form.skills.split(',').map(s => s.trim()).filter(Boolean)
+  const statusCfg  = STATUS_CONFIG[form.status] || STATUS_CONFIG.applied
 
   if (fetching) return (
     <div className={styles.loadingWrap}><Spinner size={28} /></div>
@@ -91,25 +87,23 @@ export default function AddCandidate() {
   return (
     <div className={styles.page}>
 
-      {/* ── Page header ── */}
-      <div className={styles.pageHeader}>
-        <button className={styles.backBtn} onClick={() => navigate('/candidates')}>
-          <ArrowLeft size={16} />
-        </button>
-        <div>
-          <h1 className={styles.pageTitle}>{isEdit ? 'Edit Candidate' : 'Add Candidate'}</h1>
-          <p className={styles.pageSubtitle}>
-            {isEdit ? 'Update candidate information' : 'Fill in the details to add a new candidate to your pipeline'}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={isEdit ? 'Edit Candidate' : 'Add Candidate'}
+        subtitle={isEdit ? 'Update candidate information' : 'Fill in the details to add a new candidate to your pipeline'}
+        icon={UserPlus}
+        iconColor="linear-gradient(135deg,#6366f1,#4f46e5)"
+        actions={
+          <button className={styles.backBtn} onClick={() => navigate('/candidates')} type="button">
+            <ArrowLeft size={16} />
+          </button>
+        }
+      />
 
       <div className={styles.layout}>
 
         {/* ── LEFT — form ── */}
         <form onSubmit={handleSubmit} className={styles.form}>
 
-          {/* Section: Basic Info */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <User size={14} />
@@ -120,57 +114,33 @@ export default function AddCandidate() {
                 <label className={styles.label}>Full Name <span className={styles.req}>*</span></label>
                 <div className={styles.inputWrap}>
                   <User size={13} className={styles.inputIcon} />
-                  <input
-                    className={styles.input}
-                    required
-                    value={form.full_name}
-                    onChange={set('full_name')}
-                    placeholder="John Doe"
-                  />
+                  <input className={styles.input} required value={form.full_name} onChange={set('full_name')} placeholder="John Doe" />
                 </div>
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Email <span className={styles.req}>*</span></label>
                 <div className={styles.inputWrap}>
                   <Mail size={13} className={styles.inputIcon} />
-                  <input
-                    className={styles.input}
-                    type="email"
-                    required
-                    value={form.email}
-                    onChange={set('email')}
-                    placeholder="john@email.com"
-                  />
+                  <input className={styles.input} type="email" required value={form.email} onChange={set('email')} placeholder="john@email.com" />
                 </div>
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Phone</label>
                 <div className={styles.inputWrap}>
                   <Phone size={13} className={styles.inputIcon} />
-                  <input
-                    className={styles.input}
-                    value={form.phone}
-                    onChange={set('phone')}
-                    placeholder="+91 98765 43210"
-                  />
+                  <input className={styles.input} value={form.phone} onChange={set('phone')} placeholder="+91 98765 43210" />
                 </div>
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Location</label>
                 <div className={styles.inputWrap}>
                   <MapPin size={13} className={styles.inputIcon} />
-                  <input
-                    className={styles.input}
-                    value={form.location}
-                    onChange={set('location')}
-                    placeholder="Mumbai, MH"
-                  />
+                  <input className={styles.input} value={form.location} onChange={set('location')} placeholder="Mumbai, MH" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Section: Role */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <Briefcase size={14} />
@@ -181,12 +151,7 @@ export default function AddCandidate() {
                 <label className={styles.label}>Experience</label>
                 <div className={styles.inputWrap}>
                   <Briefcase size={13} className={styles.inputIcon} />
-                  <input
-                    className={styles.input}
-                    value={form.experience}
-                    onChange={set('experience')}
-                    placeholder="3 years"
-                  />
+                  <input className={styles.input} value={form.experience} onChange={set('experience')} placeholder="3 years" />
                 </div>
               </div>
               <div className={styles.field}>
@@ -200,7 +165,6 @@ export default function AddCandidate() {
             </div>
           </div>
 
-          {/* Section: Skills */}
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <Tag size={14} />
@@ -213,14 +177,8 @@ export default function AddCandidate() {
               </label>
               <div className={styles.inputWrap}>
                 <Tag size={13} className={styles.inputIcon} />
-                <input
-                  className={styles.input}
-                  value={form.skills}
-                  onChange={set('skills')}
-                  placeholder="React, Node.js, Python, TypeScript"
-                />
+                <input className={styles.input} value={form.skills} onChange={set('skills')} placeholder="React, Node.js, Python, TypeScript" />
               </div>
-              {/* Live skill chips */}
               {skillChips.length > 0 && (
                 <div className={styles.skillChips}>
                   {skillChips.map(s => (
@@ -231,20 +189,9 @@ export default function AddCandidate() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className={styles.actions}>
-            <button
-              type="button"
-              className={styles.cancelBtn}
-              onClick={() => navigate('/candidates')}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className={styles.submitBtn}
-              disabled={loading}
-            >
+            <button type="button" className={styles.cancelBtn} onClick={() => navigate('/candidates')}>Cancel</button>
+            <button type="submit" className={styles.submitBtn} disabled={loading}>
               {loading
                 ? <><Spinner size={13} /> Saving…</>
                 : <><CheckCircle2 size={14} /> {isEdit ? 'Save Changes' : 'Add Candidate'}</>
@@ -256,14 +203,9 @@ export default function AddCandidate() {
         {/* ── RIGHT — live preview card ── */}
         <aside className={styles.preview}>
           <p className={styles.previewLabel}>Live Preview</p>
-
           <div className={styles.previewCard}>
-            {/* Avatar + name */}
             <div className={styles.previewTop}>
-              <div
-                className={styles.previewAvatar}
-                style={{ background: avatarGradient(form.full_name) }}
-              >
+              <div className={styles.previewAvatar} style={{ background: avatarGradient(form.full_name) }}>
                 {getInitials(form.full_name)}
               </div>
               <div className={styles.previewNameWrap}>
@@ -274,28 +216,15 @@ export default function AddCandidate() {
                   {form.email || <span className={styles.previewPlaceholder}>email@domain.com</span>}
                 </span>
               </div>
-              <span
-                className={styles.previewBadge}
-                style={{ color: statusCfg.color, background: statusCfg.bg }}
-              >
+              <span className={styles.previewBadge} style={{ color: statusCfg.color, background: statusCfg.bg }}>
                 {statusCfg.label}
               </span>
             </div>
-
-            {/* Meta */}
             <div className={styles.previewMeta}>
-              {form.location && (
-                <span className={styles.previewMetaItem}><MapPin size={11} />{form.location}</span>
-              )}
-              {form.experience && (
-                <span className={styles.previewMetaItem}><Briefcase size={11} />{form.experience}</span>
-              )}
-              {form.phone && (
-                <span className={styles.previewMetaItem}><Phone size={11} />{form.phone}</span>
-              )}
+              {form.location && (<span className={styles.previewMetaItem}><MapPin size={11} />{form.location}</span>)}
+              {form.experience && (<span className={styles.previewMetaItem}><Briefcase size={11} />{form.experience}</span>)}
+              {form.phone && (<span className={styles.previewMetaItem}><Phone size={11} />{form.phone}</span>)}
             </div>
-
-            {/* Skills */}
             {skillChips.length > 0 && (
               <div className={styles.previewSkills}>
                 {skillChips.slice(0, 6).map(s => (
@@ -304,7 +233,6 @@ export default function AddCandidate() {
               </div>
             )}
           </div>
-
           <p className={styles.previewHint}>Updates as you type</p>
         </aside>
       </div>

@@ -7,6 +7,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import Modal from '@/components/ui/Modal'
 import Spinner from '@/components/ui/Spinner'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import PageHeader from '@/components/ui/PageHeader'
 import toast from 'react-hot-toast'
 import styles from './TaskBoard.module.css'
 
@@ -18,12 +19,12 @@ const PRIORITY_CONFIG = {
 
 export default function TaskBoard() {
   const { user, role } = useAuth()
-  const [tasks, setTasks]         = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [creating, setCreating]   = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
-  const [deletingId, setDeletingId] = useState(null)
-  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [tasks, setTasks]               = useState([])
+  const [loading, setLoading]           = useState(true)
+  const [creating, setCreating]         = useState(false)
+  const [modalOpen, setModalOpen]       = useState(false)
+  const [deletingId, setDeletingId]     = useState(null)
+  const [confirmOpen, setConfirmOpen]   = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [form, setForm] = useState({ title: '', priority: 'Medium', status: 'Todo', assigned_to: '' })
 
@@ -84,18 +85,17 @@ export default function TaskBoard() {
   return (
     <div className={styles.page}>
 
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div>
-          <h1 className={styles.pageTitle}>Tasks</h1>
-          <p className={styles.pageSubtitle}>
-            {todo.length} pending · {completed.length} completed
-          </p>
-        </div>
-        <button className={styles.addBtn} onClick={() => setModalOpen(true)}>
-          <Plus size={14} /> New Task
-        </button>
-      </div>
+      <PageHeader
+        title="Tasks"
+        subtitle={`${todo.length} pending · ${completed.length} completed`}
+        icon={CheckSquare}
+        iconColor="linear-gradient(135deg,#16a34a,#15803d)"
+        actions={
+          <button className={styles.addBtn} onClick={() => setModalOpen(true)}>
+            <Plus size={14} /> New Task
+          </button>
+        }
+      />
 
       {loading ? (
         <div className={styles.loadingWrap}><Spinner size={24} /></div>
@@ -112,8 +112,6 @@ export default function TaskBoard() {
         />
       ) : (
         <div className={styles.lists}>
-
-          {/* To-do */}
           {todo.length > 0 && (
             <div className={styles.group}>
               <p className={styles.groupLabel}>To Do <span>{todo.length}</span></p>
@@ -122,8 +120,6 @@ export default function TaskBoard() {
               </div>
             </div>
           )}
-
-          {/* Completed */}
           {completed.length > 0 && (
             <div className={styles.group}>
               <p className={styles.groupLabel}>Completed <span>{completed.length}</span></p>
@@ -135,7 +131,6 @@ export default function TaskBoard() {
         </div>
       )}
 
-      {/* New Task Modal */}
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

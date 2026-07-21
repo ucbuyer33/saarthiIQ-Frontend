@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react'
 import { Upload, FileText, CheckCircle2, X, CloudUpload } from 'lucide-react'
 import { resumeAPI } from '@/lib/api'
+import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
 import styles from './ResumeUpload.module.css'
@@ -41,24 +42,16 @@ export default function ResumeUpload() {
   return (
     <div className={styles.page}>
 
-      {/* Header */}
-      <div className={styles.pageHeader}>
-        <div className={styles.headerIcon}>
-          <CloudUpload size={20} />
-        </div>
-        <div>
-          <h1 className={styles.pageTitle}>Resume Upload</h1>
-          <p className={styles.pageSubtitle}>Upload and auto-parse a candidate’s resume using AI</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Resume Upload"
+        subtitle="Upload and auto-parse a candidate's resume using AI"
+        icon={CloudUpload}
+        iconColor="linear-gradient(135deg,#6366f1,#4f46e5)"
+      />
 
       <div className={styles.layout}>
-
-        {/* Form card */}
         <div className={styles.card}>
           <form onSubmit={handleUpload} className={styles.form}>
-
-            {/* Candidate ID */}
             <div className={styles.field}>
               <label className={styles.label}>Candidate ID <span className={styles.req}>*</span></label>
               <input
@@ -69,8 +62,6 @@ export default function ResumeUpload() {
                 required
               />
             </div>
-
-            {/* Dropzone */}
             <div className={styles.field}>
               <label className={styles.label}>Resume File <span className={styles.hint}>PDF or DOCX</span></label>
               <div
@@ -109,16 +100,13 @@ export default function ResumeUpload() {
                   </>
                 ) : (
                   <>
-                    <div className={styles.dropzoneIcon}>
-                      <Upload size={22} />
-                    </div>
+                    <div className={styles.dropzoneIcon}><Upload size={22} /></div>
                     <p className={styles.dropzoneText}>Drop your file here, or <span>click to browse</span></p>
                     <p className={styles.dropzoneHint}>PDF, DOCX · Max 10 MB</p>
                   </>
                 )}
               </div>
             </div>
-
             <button type="submit" className={styles.submitBtn} disabled={uploading || !file || !candidateId}>
               {uploading
                 ? <><Spinner size={14} /> Uploading &amp; Parsing…</>
@@ -126,8 +114,6 @@ export default function ResumeUpload() {
             </button>
           </form>
         </div>
-
-        {/* Result panel */}
         {parsed && (
           <div className={styles.resultCard}>
             <div className={styles.resultHeader}>
