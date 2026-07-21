@@ -1,12 +1,5 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
-export const ROLES = {
-  ADMIN:       'admin',
-  RECRUITER:   'recruiter',
-  INTERVIEWER: 'interviewer',
-  USER:        'user',
-}
-
 export const CANDIDATE_STATUSES = [
   { value: 'Applied',      label: 'Applied',      badge: 'badge-applied' },
   { value: 'Shortlisted',  label: 'Shortlisted',  badge: 'badge-shortlisted' },
@@ -27,17 +20,17 @@ export const TASK_PRIORITIES = [
 
 export const TASK_STATUSES = ['Pending', 'In Progress', 'Done']
 
+// Single-role (recruiter) app — every nav item is visible to every logged-in user.
 export const NAV_ITEMS = [
-  { path: '/dashboard',        label: 'Dashboard',    icon: 'LayoutDashboard', roles: ['admin','recruiter','interviewer','user'] },
-  { path: '/candidates',       label: 'Candidates',   icon: 'Users',           roles: ['admin','recruiter'] },
-  { path: '/resume',           label: 'Resumes',      icon: 'FileText',        roles: ['admin','recruiter'] },
-  { path: '/ai/skill-gap',     label: 'Skill Gap',    icon: 'TrendingUp',      roles: ['admin','recruiter'] },
-  { path: '/ai/report',        label: 'AI Reports',   icon: 'Brain',           roles: ['admin','recruiter'] },
-  { path: '/interviews',       label: 'Interviews',   icon: 'Calendar',        roles: ['admin','recruiter','interviewer'] },
-  { path: '/campaigns',        label: 'Campaigns',    icon: 'Megaphone',       roles: ['admin','recruiter'] },
-  { path: '/tasks',            label: 'Tasks',        icon: 'CheckSquare',     roles: ['admin','recruiter'] },
-  { path: '/analytics',        label: 'Analytics',    icon: 'BarChart2',       roles: ['admin','recruiter'] },
-  { path: '/admin/users',      label: 'Users',        icon: 'UserCog',         roles: ['admin'] },
-  { path: '/admin/audit',      label: 'Audit Log',    icon: 'Shield',          roles: ['admin'] },
-  { path: '/profile',          label: 'Profile',      icon: 'Settings',        roles: ['admin','recruiter','interviewer','user'] },
+  { path: '/dashboard',        label: 'Dashboard',    icon: 'LayoutDashboard', section: 'Main' },
+  { path: '/candidates',       label: 'Candidates',   icon: 'Users',           section: 'Recruitment' },
+  { path: '/resume',           label: 'Resumes',      icon: 'FileText',        section: 'Recruitment' },
+  { path: '/ai/skill-gap',     label: 'Skill Gap',    icon: 'TrendingUp',      section: 'Recruitment' },
+  { path: '/ai/report',        label: 'AI Reports',   icon: 'Brain',           section: 'Recruitment' },
+  { path: '/interviews',       label: 'Interviews',   icon: 'Calendar',        section: 'Recruitment' },
+  { path: '/campaigns',        label: 'Campaigns',    icon: 'Megaphone',       section: 'Recruitment' },
+  { path: '/tasks',            label: 'Tasks',        icon: 'CheckSquare',     section: 'Tools' },
+  { path: '/analytics',        label: 'Analytics',    icon: 'BarChart2',       section: 'Tools' },
+  { path: '/activity',         label: 'Activity Log', icon: 'Shield',          section: 'Tools' },
+  { path: '/profile',          label: 'Profile',      icon: 'Settings',        section: 'Main' },
 ]
