@@ -38,7 +38,7 @@ function getStrength(pw) {
 export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    full_name: '', email: '', password: '', confirm: '', role: 'user',
+    full_name: '', email: '', password: '', confirm: '',
   })
   const [showPw, setShowPw] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
@@ -79,7 +79,6 @@ export default function Register() {
         full_name: form.full_name,
         email: form.email,
         password: form.password,
-        role: form.role,
       })
 
       const userId = res.data?.user_id
@@ -124,28 +123,28 @@ export default function Register() {
             </div>
             <div className={styles.logoMeta}>
               <span className={styles.leftLogoText}>SaarthiIQ</span>
-              <span className={styles.leftLogoSub}>AI LEARNING PLATFORM</span>
+              <span className={styles.leftLogoSub}>AI RECRUITMENT PLATFORM</span>
             </div>
           </div>
         </header>
 
         <main className={styles.leftContent}>
-          <p className={styles.leftTag}>START YOUR JOURNEY</p>
+          <p className={styles.leftTag}>START HIRING SMARTER</p>
           <h1 className={styles.leftHeading}>
-            Build knowledge<br />
-            that actually{' '}
-            <em className={styles.leftHeadingAccent}>sticks.</em>
+            Spend less time<br />
+            on admin, more time{' '}
+            <em className={styles.leftHeadingAccent}>hiring.</em>
           </h1>
           <p className={styles.leftDesc}>
-            Create your free account and join 50,000+ learners who use
-            SaarthiIQ to track mastery, close skill gaps, and grow faster.
+            Create your free recruiter account and let SaarthiIQ automate
+            resume screening, candidate ranking, and interview scheduling.
           </p>
 
           <div className={styles.featureList}>
             {[
-              'Personalised learning path from day one',
-              'AI-powered gap analysis after every session',
-              'Track progress across topics and skills',
+              'Automated resume parsing and scoring',
+              'AI-powered candidate ranking against job requirements',
+              'One-click interview scheduling',
             ].map((f, i) => (
               <div key={i} className={styles.featureItem}>
                 <span className={styles.featureCheck} aria-hidden="true">
@@ -169,7 +168,7 @@ export default function Register() {
               </div>
             ))}
           </div>
-          <span className={styles.avatarLabel}>Joined by 50,000+ students this year</span>
+          <span className={styles.avatarLabel}>Trusted by recruiters hiring faster every day</span>
         </footer>
       </div>
 
@@ -177,8 +176,8 @@ export default function Register() {
       <div className={styles.right}>
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <h2 className={styles.title}>Create account</h2>
-            <p className={styles.subtitle}>Join 50,000+ learners on SaarthiIQ.</p>
+            <h2 className={styles.title}>Create your recruiter account</h2>
+            <p className={styles.subtitle}>Automate the busywork. Focus on people.</p>
           </div>
 
           {error && (
@@ -318,32 +317,6 @@ export default function Register() {
                 >
                   {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
-              </div>
-            </div>
-
-            {/* Account Type */}
-            <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="role">Account Type</label>
-              <div className={styles.selectWrap}>
-                <select
-                  id="role"
-                  className={styles.select}
-                  value={form.role}
-                  onChange={set('role')}
-                >
-                  <option value="user">Recruitee — I'm looking for opportunities</option>
-                  <option value="recruiter">Recruiter — I'm hiring talent</option>
-                </select>
-                <svg
-                  className={styles.selectChevron}
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  width="14"
-                  height="14"
-                  aria-hidden="true"
-                >
-                  <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
               </div>
             </div>
 
