@@ -7,7 +7,7 @@ import { useTheme } from '@/context/ThemeContext'
 import styles from './Topbar.module.css'
 
 export default function Topbar({ onToggleSidebarMobile }) {
-  const { user, logout, role } = useAuth()
+  const { user, logout }        = useAuth()
   const { theme, toggle }       = useTheme()
   const navigate                = useNavigate()
   const [query, setQuery]       = useState('')
@@ -93,7 +93,7 @@ export default function Topbar({ onToggleSidebarMobile }) {
             </div>
             <div className={styles.userInfo}>
               <span className={styles.userName}>{user?.full_name || 'User'}</span>
-              <span className={styles.userRole}>{role}</span>
+              <span className={styles.userRole}>Recruiter</span>
             </div>
             <ChevronDown size={12} className={styles.chevron} />
           </button>
