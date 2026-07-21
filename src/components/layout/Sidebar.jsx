@@ -3,20 +3,19 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, FileText, TrendingUp, Brain,
   Calendar, Megaphone, CheckSquare, BarChart2,
-  UserCog, Shield, Settings,
+  Shield, Settings,
   PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react'
-import { useAuth } from '@/context/AuthContext'
 import { NAV_ITEMS } from '@/lib/constants'
 import styles from './Sidebar.module.css'
 
 const ICONS = {
   LayoutDashboard, Users, FileText, TrendingUp, Brain,
   Calendar, Megaphone, CheckSquare, BarChart2,
-  UserCog, Shield, Settings,
+  Shield, Settings,
 }
 
-const SECTION_ORDER = ['Main', 'Recruitment', 'Tools', 'Admin']
+const SECTION_ORDER = ['Main', 'Recruitment', 'Tools']
 
 function groupItems(items) {
   const groups = {}
@@ -29,9 +28,8 @@ function groupItems(items) {
 }
 
 export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobile }) {
-  const { role } = useAuth()
-  const visibleItems = NAV_ITEMS.filter(item => item.roles.includes(role))
-  const groups = groupItems(visibleItems)
+  // Single-role (recruiter) app — every logged-in user sees every nav item.
+  const groups = groupItems(NAV_ITEMS)
 
   const handleNavClick = () => {
     if (window.innerWidth <= 768) onCloseMobile?.()
