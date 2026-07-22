@@ -16,12 +16,6 @@ const handleThemeChange = (e) => {
   document.documentElement.dataset.theme = e.matches ? 'dark' : 'light'
 }
 
-if (media.addEventListener) {
-  media.addEventListener('change', handleThemeChange)
-} else {
-  media.addListener(handleThemeChange)
-}
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>

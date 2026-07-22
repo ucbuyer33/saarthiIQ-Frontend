@@ -1,7 +1,20 @@
 // saarthiIQ-Frontend\src\pages\auth\Register.jsx
 import { useState, useEffect } from 'react'
+import BrandLogo from '@/components/BrandLogo';
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, AlertCircle, Check, ArrowRight } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Check,
+  ArrowRight,
+  Users,
+  FileText,
+  BarChart3,
+  ShieldCheck,
+  UserRoundCheck,
+  FileCheck,
+} from 'lucide-react'
 import { authAPI } from '@/lib/api'
 import Spinner from '@/components/ui/Spinner'
 import styles from './Auth.module.css'
@@ -102,6 +115,47 @@ export default function Register() {
       setLoading(false)
     }
   }
+  const FEATURES = [
+    {
+      id: 'matching',
+      icon: <Users size={20} strokeWidth={2} />,
+      title: 'Smart candidate matching',
+      sub: 'Find the right fit faster with AI',
+    },
+    {
+      id: 'resume',
+      icon: <FileText size={20} strokeWidth={2} />,
+      title: 'Resume intelligence',
+      sub: 'AI-powered analysis & skill extraction',
+    },
+    {
+      id: 'hiring',
+      icon: <BarChart3 size={20} strokeWidth={2} />,
+      title: 'Data-driven hiring',
+      sub: 'Analytics and insights to hire with confidence',
+    },
+  ]
+
+  const STATS = [
+    {
+      id: 'candidates',
+      icon: <UserRoundCheck size={18} strokeWidth={2.2} />,
+      value: '50K+',
+      label: 'Candidate Profiles',
+    },
+    {
+      id: 'resumes',
+      icon: <FileCheck size={18} strokeWidth={2.2} />,
+      value: '1M+',
+      label: 'Resumes Processed',
+    },
+    {
+      id: 'accuracy',
+      icon: <BarChart3 size={18} strokeWidth={2.2} />,
+      value: '95%',
+      label: 'Match Accuracy',
+    },
+  ]
 
   return (
     <div className={styles.page}>
@@ -114,61 +168,62 @@ export default function Register() {
 
         <header className={styles.leftHeader}>
           <div className={styles.leftLogo}>
-            <div className={styles.logoIcon} aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" width="36" height="36">
-                <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="16" cy="10" r="2" fill="white" />
-                <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div className={styles.logoMeta}>
-              <span className={styles.leftLogoText}>SaarthiIQ</span>
-              <span className={styles.leftLogoSub}>AI RECRUITMENT PLATFORM</span>
-            </div>
+            <BrandLogo className={styles.leftLogoImage} // add this class in Auth.module.css
+            />
           </div>
         </header>
 
         <main className={styles.leftContent}>
-          <p className={styles.leftTag}>START HIRING SMARTER</p>
+          <p className={styles.leftTag}>START YOUR RECRUITMENT JOURNEY</p>
           <h1 className={styles.leftHeading}>
-            Spend less time<br />
-            on admin, more time{' '}
-            <em className={styles.leftHeadingAccent}>hiring.</em>
+            Hire the right talent.<br />
+            Build
+            <em className={styles.leftHeadingAccent}> winning teams.</em>
           </h1>
           <p className={styles.leftDesc}>
-            Create your free recruiter account and let SaarthiIQ automate
-            resume screening, candidate ranking, and interview scheduling.
+            Create your free SaarthiHire account and join thousands of
+            recruiters who simplify hiring with AI-powered insights,
+            smart matching, and end-to-end recruiting.
           </p>
 
+          {/* ── Feature Cards (icon + title + subtitle) ── */}
           <div className={styles.featureList}>
-            {[
-              'Automated resume parsing and scoring',
-              'AI-powered candidate ranking against job requirements',
-              'One-click interview scheduling',
-            ].map((f, i) => (
-              <div key={i} className={styles.featureItem}>
-                <span className={styles.featureCheck} aria-hidden="true">
-                  <Check size={11} strokeWidth={3} />
+            {FEATURES.map((f) => (
+              <div key={f.id} className={styles.featureItem}>
+                <span className={styles.featureIconWrap} aria-hidden="true">
+                  {f.icon}
                 </span>
-                <span>{f}</span>
+                <span className={styles.featureText}>
+                  <strong className={styles.featureTitle}>{f.title}</strong>
+                  <span className={styles.featureSub}>{f.sub}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Stats Bar ── */}
+          <div className={styles.statsBar}>
+            {STATS.map((s) => (
+              <div key={s.id} className={styles.statItem}>
+                <span className={styles.statIconWrap} aria-hidden="true">
+                  {s.icon}
+                </span>
+                <div>
+                  <div className={styles.statValue}>{s.value}</div>
+                  <div className={styles.statLabel}>{s.label}</div>
+                </div>
               </div>
             ))}
           </div>
         </main>
 
-        <footer className={styles.avatarRow}>
-          <div className={styles.avatarStack} aria-hidden="true">
-            {AVATARS.map((av, i) => (
-              <div
-                key={i}
-                className={styles.avatar}
-                style={{ background: av.color, zIndex: AVATARS.length - i }}
-              >
-                {av.letter}
-              </div>
-            ))}
-          </div>
-          <span className={styles.avatarLabel}>Trusted by recruiters hiring faster every day</span>
+        <footer className={styles.trustRow}>
+          <span className={styles.trustIcon} aria-hidden="true">
+            <ShieldCheck size={16} strokeWidth={2} />
+          </span>
+          <span className={styles.trustLabel}>
+            Secure. Reliable. Trusted by recruitment professionals.
+          </span>
         </footer>
       </div>
 
@@ -176,8 +231,8 @@ export default function Register() {
       <div className={styles.right}>
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <h2 className={styles.title}>Create your recruiter account</h2>
-            <p className={styles.subtitle}>Automate the busywork. Focus on people.</p>
+            <h2 className={styles.title}>Create your Recruiter account</h2>
+            <p className={styles.subtitle}>Join 80,000+ recruiters using SaarthiHire</p>
           </div>
 
           {error && (

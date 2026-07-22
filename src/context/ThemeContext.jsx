@@ -3,30 +3,22 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const ThemeContext = createContext(null)
 
-function getInitialTheme() {
-  // 1. Persisted preference wins
-  const saved = localStorage.getItem('saarthiiq-theme')
-  if (saved === 'dark' || saved === 'light') return saved
-  // 2. Fall back to OS preference
+function getOSTheme() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(getInitialTheme)
+  const [theme, setTheme] = useState(getOSTheme)
 
+  // Keep <html data-theme> in sync with state
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('saarthiiq-theme', theme)
   }, [theme])
 
-  // Also react to live OS theme changes (only when no saved preference)
+  // React live to OS preference changes
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
-    const handler = (e) => {
-      if (!localStorage.getItem('saarthiiq-theme')) {
-        setTheme(e.matches ? 'dark' : 'light')
-      }
-    }
+    const handler = (e) => setTheme(e.matches ? 'dark' : 'light')
     mq.addEventListener('change', handler)
     return () => mq.removeEventListener('change', handler)
   }, [])
