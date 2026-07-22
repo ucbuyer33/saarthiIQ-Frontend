@@ -9,12 +9,20 @@ import { ThemeProvider } from './context/ThemeContext'
 import './styles/base.css'
 import './styles/components.css'
 
+<<<<<<< HEAD
 const media = window.matchMedia('(prefers-color-scheme: dark)')
 document.documentElement.dataset.theme = media.matches ? 'dark' : 'light'
 
 const handleThemeChange = (e) => {
   document.documentElement.dataset.theme = e.matches ? 'dark' : 'light'
 }
+=======
+// NOTE: Theme initialisation is handled in two places only:
+//   1. index.html inline <script> — sets data-theme before first paint (no flicker)
+//   2. ThemeContext.jsx — owns theme state, persists to localStorage, reacts to toggle
+// Do NOT add any document.documentElement.dataset.theme assignments here —
+// they bypass localStorage and override the user's saved preference.
+>>>>>>> 25581a99414c680a51dde4b30c4a080b9f04bd3b
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
