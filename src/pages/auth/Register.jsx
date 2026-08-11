@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { authAPI } from '@/lib/api'
 import Spinner from '@/components/ui/Spinner'
+import TnCModal from '@/components/ui/TnCModal'
 import styles from './Auth.module.css'
 import toast from 'react-hot-toast'
 
@@ -30,19 +31,19 @@ const AVATARS = [
 ]
 
 const PW_RULES = [
-  { key: 'len', label: 'At least 8 characters', test: p => p.length >= 8 },
-  { key: 'upper', label: 'Contains uppercase letter', test: p => /[A-Z]/.test(p) },
-  { key: 'lower', label: 'Contains lowercase letter', test: p => /[a-z]/.test(p) },
-  { key: 'number', label: 'Contains number', test: p => /[0-9]/.test(p) },
-  { key: 'special', label: 'Contains special character', test: p => /[^A-Za-z0-9]/.test(p) },
+  { key: 'len',     label: 'At least 8 characters',      test: p => p.length >= 8 },
+  { key: 'upper',   label: 'Contains uppercase letter',   test: p => /[A-Z]/.test(p) },
+  { key: 'lower',   label: 'Contains lowercase letter',   test: p => /[a-z]/.test(p) },
+  { key: 'number',  label: 'Contains number',             test: p => /[0-9]/.test(p) },
+  { key: 'special', label: 'Contains special character',  test: p => /[^A-Za-z0-9]/.test(p) },
 ]
 
 const STRENGTH_META = [
-  { label: 'Very Weak', color: '#ef4444', pct: '20%' },
-  { label: 'Weak', color: '#ef4444', pct: '20%' },
-  { label: 'Fair', color: '#f59e0b', pct: '50%' },
-  { label: 'Good', color: '#4db6bc', pct: '75%' },
-  { label: 'Strong', color: '#4ade80', pct: '100%' },
+  { label: 'Very Weak', color: '#ef4444', pct: '20%'  },
+  { label: 'Weak',      color: '#ef4444', pct: '20%'  },
+  { label: 'Fair',      color: '#f59e0b', pct: '50%'  },
+  { label: 'Good',      color: '#4db6bc', pct: '75%'  },
+  { label: 'Strong',    color: '#4ade80', pct: '100%' },
 ]
 
 function getStrength(pw) {
@@ -55,23 +56,24 @@ export default function Register() {
   const [form, setForm] = useState({
     full_name: '', email: '', password: '', confirm: '',
   })
-  const [showPw, setShowPw] = useState(false)
+  const [showPw,      setShowPw]      = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [pwFocused, setPwFocused] = useState(false)
-  const [showStrength, setShowStrength] = useState(false)
+  const [loading,     setLoading]     = useState(false)
+  const [error,       setError]       = useState('')
+  const [pwFocused,   setPwFocused]   = useState(false)
+  const [showStrength,setShowStrength]= useState(false)
 
-  // Show when focused or has text
+  // ── TnC state ──
+  const [tncAccepted,  setTncAccepted]  = useState(false)
+  const [modalOpen,    setModalOpen]    = useState(false)
+  const [modalTab,     setModalTab]     = useState('tnc')
+
+  // Show strength panel when focused or has text
   useEffect(() => {
-    if (pwFocused || form.password.length > 0) {
-      setShowStrength(true)
-    } else {
-      setShowStrength(false)
-    }
+    setShowStrength(pwFocused || form.password.length > 0)
   }, [pwFocused, form.password])
 
-  // Auto-collapse after 0.1s when all rules pass
+  // Auto-collapse after 0.1s when all rules pass and not focused
   useEffect(() => {
     const allPassed = PW_RULES.every(r => r.test(form.password))
     if (allPassed && form.password.length > 0 && !pwFocused) {
@@ -79,36 +81,39 @@ export default function Register() {
       return () => clearTimeout(t)
     }
   }, [form.password, pwFocused])
+
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   const strengthIdx = getStrength(form.password)
-  const pwsMatch = form.confirm && form.password === form.confirm
+  const pwsMatch    = form.confirm && form.password === form.confirm
+
+  // Open modal pointing at the right tab
+  const openTnC     = (e) => { e.preventDefault(); setModalTab('tnc');     setModalOpen(true) }
+  const openPrivacy = (e) => { e.preventDefault(); setModalTab('privacy'); setModalOpen(true) }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!tncAccepted) {
+      setError('Please accept the Terms & Conditions and Privacy Policy to continue.')
+      setModalOpen(true)
+      return
+    }
     if (form.password !== form.confirm) { setError('Passwords do not match'); return }
     setLoading(true)
     setError('')
     try {
       const res = await authAPI.register({
         full_name: form.full_name,
-        email: form.email,
-        password: form.password,
+        email:     form.email,
+        password:  form.password,
       })
-
       const userId = res.data?.user_id
-
       if (userId) {
         toast.success(`Account created! Your ID: ${userId}`)
-        // Wait a bit before navigating so user sees the toast
-        setTimeout(() => {
-          navigate('/login')
-        }, 2000)
+        setTimeout(() => navigate('/login'), 2000)
       } else {
         toast.success('Account created! Please sign in.')
-        setTimeout(() => {
-          navigate('/login')
-        }, 1500)
+        setTimeout(() => navigate('/login'), 1500)
       }
     } catch (err) {
       console.error('Registration error:', err)
@@ -117,6 +122,7 @@ export default function Register() {
       setLoading(false)
     }
   }
+
   const FEATURES = [
     {
       id: 'matching',
@@ -162,6 +168,19 @@ export default function Register() {
   return (
     <div className={styles.page}>
 
+      {/* ── TnC / Privacy Modal ── */}
+      <TnCModal
+        open={modalOpen}
+        tab={modalTab}
+        onClose={() => setModalOpen(false)}
+        onAccept={() => {
+          setTncAccepted(true)
+          setModalOpen(false)
+          setError('')
+          toast.success('Terms accepted!')
+        }}
+      />
+
       {/* ── LEFT PANEL ── */}
       <div className={styles.left}>
         <div className={styles.leftGlow1} aria-hidden="true" />
@@ -170,8 +189,7 @@ export default function Register() {
 
         <header className={styles.leftHeader}>
           <div className={styles.leftLogo}>
-            <BrandLogo className={styles.leftLogoImage} // add this class in Auth.module.css
-            />
+            <BrandLogo className={styles.leftLogoImage} />
           </div>
         </header>
 
@@ -188,13 +206,10 @@ export default function Register() {
             smart matching, and end-to-end recruiting.
           </p>
 
-          {/* ── Feature Cards (icon + title + subtitle) ── */}
           <div className={styles.featureList}>
             {FEATURES.map((f) => (
               <div key={f.id} className={styles.featureItem}>
-                <span className={styles.featureIconWrap} aria-hidden="true">
-                  {f.icon}
-                </span>
+                <span className={styles.featureIconWrap} aria-hidden="true">{f.icon}</span>
                 <span className={styles.featureText}>
                   <strong className={styles.featureTitle}>{f.title}</strong>
                   <span className={styles.featureSub}>{f.sub}</span>
@@ -203,13 +218,10 @@ export default function Register() {
             ))}
           </div>
 
-          {/* ── Stats Bar ── */}
           <div className={styles.statsBar}>
             {STATS.map((s) => (
               <div key={s.id} className={styles.statItem}>
-                <span className={styles.statIconWrap} aria-hidden="true">
-                  {s.icon}
-                </span>
+                <span className={styles.statIconWrap} aria-hidden="true">{s.icon}</span>
                 <div>
                   <div className={styles.statValue}>{s.value}</div>
                   <div className={styles.statLabel}>{s.label}</div>
@@ -304,19 +316,17 @@ export default function Register() {
                 </button>
               </div>
 
-              {/* Strength UI — shows when typing */}
               <div className={`${styles.strengthWrap} ${showStrength ? styles.strengthOpen : styles.strengthClosed}`}>
                 <div className={styles.strengthPanel}>
                   <div className={styles.strengthBarTrack}>
                     <div
                       className={styles.strengthBarFill}
                       style={{
-                        width: strengthIdx >= 0 ? STRENGTH_META[strengthIdx].pct : '0%',
+                        width:      strengthIdx >= 0 ? STRENGTH_META[strengthIdx].pct   : '0%',
                         background: strengthIdx >= 0 ? STRENGTH_META[strengthIdx].color : '#ef4444',
                       }}
                     />
                   </div>
-
                   {strengthIdx >= 0 && (
                     <p className={styles.strengthText}>
                       Password strength:{' '}
@@ -325,7 +335,6 @@ export default function Register() {
                       </strong>
                     </p>
                   )}
-
                   <ul className={styles.pwRuleList} aria-label="Password requirements">
                     {PW_RULES.map(rule => {
                       const passed = form.password && rule.test(form.password)
@@ -341,7 +350,6 @@ export default function Register() {
                   </ul>
                 </div>
               </div>
-
             </div>
 
             {/* Confirm Password */}
@@ -377,6 +385,36 @@ export default function Register() {
               </div>
             </div>
 
+            {/* ── TnC Checkbox ── */}
+            <div className={styles.tncRow}>
+              <label className={styles.tncLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.tncCheckbox}
+                  checked={tncAccepted}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      // Open modal to read before accepting
+                      setModalTab('tnc')
+                      setModalOpen(true)
+                    } else {
+                      setTncAccepted(false)
+                    }
+                  }}
+                />
+                <span className={styles.tncText}>
+                  I have read and agree to the{' '}
+                  <button type="button" className={styles.tncLink} onClick={openTnC}>
+                    Terms &amp; Conditions
+                  </button>
+                  {' '}and{' '}
+                  <button type="button" className={styles.tncLink} onClick={openPrivacy}>
+                    Privacy Policy
+                  </button>
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
               className={styles.submitBtn}
@@ -385,8 +423,7 @@ export default function Register() {
             >
               {loading
                 ? <Spinner size={16} />
-                : <><span>Create account</span><ArrowRight size={15} className={styles.arrowIcon} /></>
-              }
+                : <><span>Create account</span><ArrowRight size={15} className={styles.arrowIcon} /></>}
             </button>
           </form>
 
