@@ -1,7 +1,8 @@
 // saarthiIQ-Frontend\src\pages\auth\Login.jsx
 import { useState } from 'react'
+import BrandLogo from '@/components/BrandLogo';
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, AlertCircle, BrainCircuit } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { authAPI } from '@/lib/api'
 import Spinner from '@/components/ui/Spinner'
@@ -49,25 +50,16 @@ export default function Login() {
 
         <header className={styles.leftHeader}>
           <div className={styles.leftLogo}>
-            <div className={styles.logoIcon} aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" width="36" height="36">
-                <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="16" cy="10" r="2" fill="white" />
-                <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div className={styles.logoMeta}>
-              <span className={styles.leftLogoText}>SaarthiHire</span>
-              <span className={styles.leftLogoSub}>AI RECRUITMENT PLATFORM</span>
-            </div>
+            <BrandLogo className={styles.leftLogoImage} // add this class in Auth.module.css
+            />
           </div>
         </header>
 
         <main className={styles.leftContent}>
-          <p className={styles.leftTag}>INTELLIGENT RECRUITMENT OS</p>
+          <p className={styles.leftTag}><BrainCircuit size={16}/>INTELLIGENT RECRUITMENT OS</p>
           <h1 className={styles.leftHeading}>
-            Find Smarter.<br />
-            <em className={styles.leftHeadingAccent}>Hire Faster.</em><br />
+            Find <em className={styles.leftHeadingAccent}>Smart</em><br />
+            Hire <em className={styles.leftHeadingAccent}>Faster</em><br />
           </h1>
           <p className={styles.leftDesc}>
             SaarthiHire empowers recruiters with AI-powered resume analysis,

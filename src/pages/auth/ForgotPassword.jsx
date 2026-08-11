@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Mail, ShieldCheck, Sparkles, KeyRound, CheckCircle2, Eye, EyeOff } from 'lucide-react'
 import styles from './Auth.module.css'
+import BrandLogo from '@/components/BrandLogo';
 
 export default function ForgotPassword() {
   const [sent, setSent] = useState(false)
@@ -29,17 +30,8 @@ export default function ForgotPassword() {
 
         <header className={styles.leftHeader}>
           <div className={styles.leftLogo}>
-            <div className={styles.logoIcon} aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none" width="36" height="36">
-                <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="16" cy="10" r="2" fill="white"/>
-                <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <div className={styles.logoMeta}>
-              <span className={styles.leftLogoText}>SaarthiIQ</span>
-              <span className={styles.leftLogoSub}>AI LEARNING PLATFORM</span>
-            </div>
+            <BrandLogo className={styles.leftLogoImage} // add this class in Auth.module.css
+            />
           </div>
         </header>
 

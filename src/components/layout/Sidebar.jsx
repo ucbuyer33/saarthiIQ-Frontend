@@ -1,5 +1,6 @@
 // src/components/layout/Sidebar.jsx
 import { NavLink } from 'react-router-dom'
+import BrandLogo from '@/components/BrandLogo';
 import {
   LayoutDashboard, Users, FileText, TrendingUp, Brain,
   Calendar, Megaphone, CheckSquare, BarChart2,
@@ -50,19 +51,10 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobi
           onClick={() => window.innerWidth > 768 && onCollapse?.()}
           aria-label="Toggle sidebar"
         >
-          <div className={styles.logoIconWrap}>
-            <svg viewBox="0 0 32 32" fill="none" width="30" height="30">
-              <path d="M8 22 L16 10 L24 22" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="16" cy="10" r="2" fill="white" />
-              <line x1="11" y1="22" x2="21" y2="22" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </div>
-          {!collapsed && (
-            <div className={styles.logoMeta}>
-              <span className={styles.logoText}>SaarthiIQ</span>
-              <span className={styles.logoBadge}>AI Platform</span>
-            </div>
-          )}
+          <BrandLogo
+            collapsed={collapsed}
+            className={collapsed ? styles.logoImgMark : styles.logoImgFull}
+          />
         </button>
 
         {/* Nav */}

@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   UserRoundCheck,
   FileCheck,
+  Route,
+  Cpu,
 } from 'lucide-react'
 import { authAPI } from '@/lib/api'
 import Spinner from '@/components/ui/Spinner'
@@ -130,7 +132,7 @@ export default function Register() {
     },
     {
       id: 'hiring',
-      icon: <BarChart3 size={20} strokeWidth={2} />,
+      icon: <Cpu size={20} strokeWidth={2} />,
       title: 'Data-driven hiring',
       sub: 'Analytics and insights to hire with confidence',
     },
@@ -174,7 +176,7 @@ export default function Register() {
         </header>
 
         <main className={styles.leftContent}>
-          <p className={styles.leftTag}>START YOUR RECRUITMENT JOURNEY</p>
+          <p className={styles.leftTag}><Route size={16}/>START YOUR RECRUITMENT JOURNEY</p>
           <h1 className={styles.leftHeading}>
             Hire the right talent.<br />
             Build
