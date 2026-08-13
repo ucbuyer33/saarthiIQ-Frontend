@@ -122,7 +122,7 @@ export default function CandidateList() {
         }
       />
 
-      {/* ── Status tabs + search bar ── */}
+      {/* existing toolbar, filters, grid/list rendering unchanged */}
       <div className={styles.toolbar}>
         <div className={styles.tabs}>
           {STATUS_TABS.map(tab => {
@@ -190,7 +190,6 @@ export default function CandidateList() {
         </div>
       </div>
 
-      {/* ── Content ── */}
       {loading ? (
         <div className={view === 'grid' ? styles.grid : styles.listView}>
           {[...Array(6)].map((_, i) => (

@@ -1,4 +1,4 @@
-// saarthiIQ-Frontend\src\lib\api.js
+// src/lib/api.js
 import axios from 'axios'
 import { getToken, clearToken } from './auth'
 import { API_BASE_URL } from './constants'
@@ -87,8 +87,9 @@ export const resumeAPI = {
 }
 
 export const aiAPI = {
-  skillGap: (resumeId) => api.post(`/skill-gap/${resumeId}`),
-  aiReport: (resumeId) => api.post(`/ai-report/${resumeId}`),
+  // Use candidate-based endpoints so SkillGap page can work from Candidate ID.
+  skillGap: (candidateId) => api.post(`/skill-gap/by-candidate/${candidateId}`),
+  aiReport: (candidateId) => api.post(`/ai-report/by-candidate/${candidateId}`),
 }
 
 export const interviewsAPI = {
