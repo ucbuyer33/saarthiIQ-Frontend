@@ -50,9 +50,12 @@ export default function App() {
           <Route path="/candidates/:id"     element={<CandidateDetail />} />
           <Route path="/candidates/:id/edit" element={<AddCandidate />} />
 
+          {/* Resume is still available as a route but removed from sidenav; flow now starts from candidates */}
           <Route path="/resume"             element={<ResumeUpload />} />
           <Route path="/resume/score/:id"   element={<ResumeScore />} />
           <Route path="/resume/match/:id"   element={<JobMatch />} />
+
+          {/* Unified Skill Gap + AI Report page */}
           <Route path="/ai/skill-gap"        element={<SkillGap />} />
 
           <Route path="/interviews"           element={<InterviewList />} />
