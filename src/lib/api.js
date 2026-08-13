@@ -1,4 +1,4 @@
-// saarthiIQ-Frontend\src\lib\api.js
+// src/lib/api.js
 import axios from 'axios'
 import { getToken, clearToken } from './auth'
 import { API_BASE_URL } from './constants'
@@ -87,8 +87,10 @@ export const resumeAPI = {
 }
 
 export const aiAPI = {
-  skillGap: (resumeId) => api.post(`/skill-gap/${resumeId}`),
-  aiReport: (resumeId) => api.post(`/ai-report/${resumeId}`),
+  skillGapByResume: (resumeId) => api.post(`/skill-gap/${resumeId}`),
+  aiReportByResume: (resumeId) => api.post(`/ai-report/${resumeId}`),
+  skillGapByCandidate: (candidateId) => api.post(`/skill-gap/by-candidate/${candidateId}`),
+  aiReportByCandidate: (candidateId) => api.post(`/ai-report/by-candidate/${candidateId}`),
 }
 
 export const interviewsAPI = {
