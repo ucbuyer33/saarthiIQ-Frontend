@@ -87,10 +87,9 @@ export const resumeAPI = {
 }
 
 export const aiAPI = {
-  skillGapByResume: (resumeId) => api.post(`/skill-gap/${resumeId}`),
-  aiReportByResume: (resumeId) => api.post(`/ai-report/${resumeId}`),
-  skillGapByCandidate: (candidateId) => api.post(`/skill-gap/by-candidate/${candidateId}`),
-  aiReportByCandidate: (candidateId) => api.post(`/ai-report/by-candidate/${candidateId}`),
+  // Use candidate-based endpoints so SkillGap page can work from Candidate ID.
+  skillGap: (candidateId) => api.post(`/skill-gap/by-candidate/${candidateId}`),
+  aiReport: (candidateId) => api.post(`/ai-report/by-candidate/${candidateId}`),
 }
 
 export const interviewsAPI = {
