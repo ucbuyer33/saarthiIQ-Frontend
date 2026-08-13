@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Search, SlidersHorizontal, Users, UserCheck, Clock, XCircle, LayoutGrid, List, FileStack } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { candidatesAPI, resumeAPI } from '@/lib/api'
+import { candidatesAPI } from '@/lib/api'
 import CandidateCard from '@/components/features/CandidateCard'
 import CandidateRow from '@/components/features/CandidateRow'
 import { CANDIDATE_STATUSES } from '@/lib/constants'
@@ -24,8 +24,6 @@ export default function CandidateList() {
   const [search, setSearch]           = useState(params.get('q') || '')
   const [statusFilter, setStatus]     = useState('')
   const [view, setView]               = useState('grid')
-  const [bulkUploading, setBulkUploading] = useState(false)
-  const [bulkFiles, setBulkFiles]         = useState([])
   const [resumeFilter, setResumeFilter]   = useState('all') // all | with | without
 
   useEffect(() => {
@@ -45,44 +43,15 @@ export default function CandidateList() {
   const shortlisted  = candidates.filter(c => c.status === 'shortlisted').length
   const interviewing = candidates.filter(c => c.status === 'interviewing').length
 
-  const handleBulkFilesChange = (e) => {
-    const files = Array.from(e.target.files || []).filter(f => f.type === 'application/pdf')
-    setBulkFiles(files)
-  }
-
-  const handleBulkUpload = async () => {
-    if (!bulkFiles.length) return
-    setBulkUploading(true)
-
-    try {
-      // Simple auto-filtering: only upload resumes for candidates that don't yet have one.
-      const candidatesWithoutResume = candidates.filter(c => !c.resume_url)
-      const toProcess = candidatesWithoutResume.slice(0, bulkFiles.length)
-
-      await Promise.all(
-        toProcess.map((candidate, idx) => {
-          const file = bulkFiles[idx]
-          if (!file) return Promise.resolve()
-          return resumeAPI.upload(candidate.id, file)
-        })
-      )
-
-      setBulkFiles([])
-      // Re-fetch candidates so UI auto-updates based on new resume URLs
-      const res = await candidatesAPI.getAll({ search, status: statusFilter })
-      setCandidates(res.data.results || [])
-    } catch (err) {
-      console.error('Bulk upload failed', err)
-    } finally {
-      setBulkUploading(false)
-    }
-  }
-
   const filteredCandidates = candidates.filter(c => {
     if (resumeFilter === 'with') return !!c.resume_url
     if (resumeFilter === 'without') return !c.resume_url
     return true
   })
+
+  const goToBulkUpload = () => {
+    navigate('/candidates/bulk-upload')
+  }
 
   return (
     <div className={styles.page}>
@@ -98,26 +67,14 @@ export default function CandidateList() {
               <Plus size={15} strokeWidth={2.5} />
               Add Candidate
             </button>
-            <label className={styles.bulkUploadLabel}>
+            <button
+              type="button"
+              className={styles.addBtn}
+              onClick={goToBulkUpload}
+            >
               <FileStack size={15} />
-              <span>Bulk Resume Upload</span>
-              <input
-                type="file"
-                multiple
-                accept="application/pdf"
-                onChange={handleBulkFilesChange}
-                style={{ display: 'none' }}
-              />
-            </label>
-            {bulkFiles.length > 0 && (
-              <button
-                className={styles.bulkUploadBtn}
-                onClick={handleBulkUpload}
-                disabled={bulkUploading}
-              >
-                {bulkUploading ? 'Uploading…' : `Upload ${bulkFiles.length} resumes`}
-              </button>
-            )}
+              Bulk Resume Upload
+            </button>
           </div>
         }
       />
