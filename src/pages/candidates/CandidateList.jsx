@@ -45,10 +45,6 @@ export default function CandidateList() {
   const shortlisted  = candidates.filter(c => c.status === 'shortlisted').length
   const interviewing = candidates.filter(c => c.status === 'interviewing').length
 
-  const handleBulkClick = () => {
-    navigate('/candidates/bulk-upload')
-  }
-
   const handleBulkFilesChange = (e) => {
     const files = Array.from(e.target.files || []).filter(f => f.type === 'application/pdf')
     setBulkFiles(files)
@@ -59,6 +55,7 @@ export default function CandidateList() {
     setBulkUploading(true)
 
     try {
+      // Simple auto-filtering: only upload resumes for candidates that don't yet have one.
       const candidatesWithoutResume = candidates.filter(c => !c.resume_url)
       const toProcess = candidatesWithoutResume.slice(0, bulkFiles.length)
 
@@ -71,6 +68,7 @@ export default function CandidateList() {
       )
 
       setBulkFiles([])
+      // Re-fetch candidates so UI auto-updates based on new resume URLs
       const res = await candidatesAPI.getAll({ search, status: statusFilter })
       setCandidates(res.data.results || [])
     } catch (err) {
@@ -100,14 +98,26 @@ export default function CandidateList() {
               <Plus size={15} strokeWidth={2.5} />
               Add Candidate
             </button>
-            <button
-              className={styles.addBtn}
-              type="button"
-              onClick={handleBulkClick}
-            >
+            <label className={styles.bulkUploadLabel}>
               <FileStack size={15} />
-              Bulk Resume Upload
-            </button>
+              <span>Bulk Resume Upload</span>
+              <input
+                type="file"
+                multiple
+                accept="application/pdf"
+                onChange={handleBulkFilesChange}
+                style={{ display: 'none' }}
+              />
+            </label>
+            {bulkFiles.length > 0 && (
+              <button
+                className={styles.bulkUploadBtn}
+                onClick={handleBulkUpload}
+                disabled={bulkUploading}
+              >
+                {bulkUploading ? 'Uploading…' : `Upload ${bulkFiles.length} resumes`}
+              </button>
+            )}
           </div>
         }
       />
