@@ -8,6 +8,7 @@ import ResumeUpload from "./pages/resume/ResumeUpload";
 import ResumeScore from "./pages/resume/ResumeScore";
 import JobMatch from "./pages/resume/JobMatch";
 import InterviewSkillGap from "./pages/interviews/InterviewSkillGap";
+import SkillGap from "./pages/ai/SkillGap";
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
             path="/interviews/skillgap"
             element={<InterviewSkillGap />}
           />
+          {/* Direct SkillGap page (used by nav or candidate link) */}
+          <Route path="/ai/skillgap" element={<SkillGap />} />
         </Routes>
       </AppShell>
     </Router>
