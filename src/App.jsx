@@ -14,6 +14,7 @@ import Dashboard from './pages/dashboard/Dashboard'
 import CandidateList from './pages/candidates/CandidateList'
 import CandidateDetail from './pages/candidates/CandidateDetail'
 import AddCandidate from './pages/candidates/AddCandidate'
+import BulkResumeUpload from './pages/candidates/BulkResumeUpload'
 import ResumeUpload from './pages/resume/ResumeUpload'
 import ResumeScore from './pages/resume/ResumeScore'
 import JobMatch from './pages/resume/JobMatch'
@@ -45,10 +46,11 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="/dashboard"      element={<Dashboard />} />
 
-          <Route path="/candidates"         element={<CandidateList />} />
-          <Route path="/candidates/add"     element={<AddCandidate />} />
-          <Route path="/candidates/:id"     element={<CandidateDetail />} />
-          <Route path="/candidates/:id/edit" element={<AddCandidate />} />
+          <Route path="/candidates"              element={<CandidateList />} />
+          <Route path="/candidates/add"          element={<AddCandidate />} />
+          <Route path="/candidates/:id"          element={<CandidateDetail />} />
+          <Route path="/candidates/:id/edit"     element={<AddCandidate />} />
+          <Route path="/candidates/bulk-upload"  element={<BulkResumeUpload />} />
 
           {/* Resume is still available as a route but removed from sidenav; flow now starts from candidates */}
           <Route path="/resume"             element={<ResumeUpload />} />
