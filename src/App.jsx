@@ -12,13 +12,13 @@ import SkillGap from "./pages/ai/SkillGap";
 
 function App() {
   return (
-    <AppShell>
-      <Routes>
+    <Routes>
+      <Route element={<AppShell />}>
+        <Route index element={<Dashboard />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/candidates" element={<CandidateList />} />
         <Route path="/candidates/new" element={<AddCandidate />} />
         <Route path="/candidates/:id" element={<CandidateDetail />} />
-        {/* Resumes embedded under candidate detail */}
         <Route
           path="/candidates/:id/resume"
           element={
@@ -29,15 +29,13 @@ function App() {
             </>
           }
         />
-        {/* Combined SkillGap + Interviews */}
         <Route
           path="/interviews/skillgap"
           element={<InterviewSkillGap />}
         />
-        {/* Direct SkillGap page (used by nav or candidate link) */}
         <Route path="/ai/skillgap" element={<SkillGap />} />
-      </Routes>
-    </AppShell>
+      </Route>
+    </Routes>
   );
 }
 
