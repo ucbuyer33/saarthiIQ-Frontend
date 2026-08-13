@@ -1,8 +1,8 @@
 // src/pages/candidates/CandidateList.jsx
 import { useState, useEffect } from 'react'
-import { Plus, Search, SlidersHorizontal, Users, UserCheck, Clock, XCircle, LayoutGrid, List } from 'lucide-react'
+import { Plus, Search, SlidersHorizontal, Users, UserCheck, Clock, XCircle, LayoutGrid, List, FileStack } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { candidatesAPI } from '@/lib/api'
+import { candidatesAPI, resumeAPI } from '@/lib/api'
 import CandidateCard from '@/components/features/CandidateCard'
 import CandidateRow from '@/components/features/CandidateRow'
 import { CANDIDATE_STATUSES } from '@/lib/constants'
@@ -24,6 +24,9 @@ export default function CandidateList() {
   const [search, setSearch]           = useState(params.get('q') || '')
   const [statusFilter, setStatus]     = useState('')
   const [view, setView]               = useState('grid')
+  const [bulkUploading, setBulkUploading] = useState(false)
+  const [bulkFiles, setBulkFiles]         = useState([])
+  const [resumeFilter, setResumeFilter]   = useState('all') // all | with | without
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,6 +45,45 @@ export default function CandidateList() {
   const shortlisted  = candidates.filter(c => c.status === 'shortlisted').length
   const interviewing = candidates.filter(c => c.status === 'interviewing').length
 
+  const handleBulkFilesChange = (e) => {
+    const files = Array.from(e.target.files || []).filter(f => f.type === 'application/pdf')
+    setBulkFiles(files)
+  }
+
+  const handleBulkUpload = async () => {
+    if (!bulkFiles.length) return
+    setBulkUploading(true)
+
+    try {
+      // Simple auto-filtering: only upload resumes for candidates that don't yet have one.
+      const candidatesWithoutResume = candidates.filter(c => !c.resume_url)
+      const toProcess = candidatesWithoutResume.slice(0, bulkFiles.length)
+
+      await Promise.all(
+        toProcess.map((candidate, idx) => {
+          const file = bulkFiles[idx]
+          if (!file) return Promise.resolve()
+          return resumeAPI.upload(candidate.id, file)
+        })
+      )
+
+      setBulkFiles([])
+      // Re-fetch candidates so UI auto-updates based on new resume URLs
+      const res = await candidatesAPI.getAll({ search, status: statusFilter })
+      setCandidates(res.data.results || [])
+    } catch (err) {
+      console.error('Bulk upload failed', err)
+    } finally {
+      setBulkUploading(false)
+    }
+  }
+
+  const filteredCandidates = candidates.filter(c => {
+    if (resumeFilter === 'with') return !!c.resume_url
+    if (resumeFilter === 'without') return !c.resume_url
+    return true
+  })
+
   return (
     <div className={styles.page}>
 
@@ -51,10 +93,32 @@ export default function CandidateList() {
         icon={Users}
         iconColor="linear-gradient(135deg,#6366f1,#4f46e5)"
         actions={
-          <button className={styles.addBtn} onClick={() => navigate('/candidates/add')}>
-            <Plus size={15} strokeWidth={2.5} />
-            Add Candidate
-          </button>
+          <div className={styles.headerActions}>
+            <button className={styles.addBtn} onClick={() => navigate('/candidates/add')}>
+              <Plus size={15} strokeWidth={2.5} />
+              Add Candidate
+            </button>
+            <label className={styles.bulkUploadLabel}>
+              <FileStack size={15} />
+              <span>Bulk Resume Upload</span>
+              <input
+                type="file"
+                multiple
+                accept="application/pdf"
+                onChange={handleBulkFilesChange}
+                style={{ display: 'none' }}
+              />
+            </label>
+            {bulkFiles.length > 0 && (
+              <button
+                className={styles.bulkUploadBtn}
+                onClick={handleBulkUpload}
+                disabled={bulkUploading}
+              >
+                {bulkUploading ? 'Uploading…' : `Upload ${bulkFiles.length} resumes`}
+              </button>
+            )}
+          </div>
         }
       />
 
@@ -98,6 +162,15 @@ export default function CandidateList() {
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>
+          <select
+            className={styles.statusSelect}
+            value={resumeFilter}
+            onChange={e => setResumeFilter(e.target.value)}
+          >
+            <option value="all">All Candidates</option>
+            <option value="with">With Resume</option>
+            <option value="without">Without Resume</option>
+          </select>
           <div className={styles.viewToggle}>
             <button
               className={`${styles.viewBtn} ${view === 'grid' ? styles.viewBtnActive : ''}`}
@@ -124,7 +197,7 @@ export default function CandidateList() {
             <div key={i} className={styles.skeletonCard} />
           ))}
         </div>
-      ) : candidates.length === 0 ? (
+      ) : filteredCandidates.length === 0 ? (
         <div className={styles.empty}>
           <div className={styles.emptyIconRing}>
             <Users size={28} strokeWidth={1.5} />
@@ -148,7 +221,7 @@ export default function CandidateList() {
         </div>
       ) : view === 'grid' ? (
         <div className={styles.grid}>
-          {candidates.map(c => <CandidateCard key={c.id} candidate={c} />)}
+          {filteredCandidates.map(c => <CandidateCard key={c.id} candidate={c} />)}
         </div>
       ) : (
         <div className={styles.table}>
@@ -160,7 +233,7 @@ export default function CandidateList() {
             <span>Skills</span>
             <span></span>
           </div>
-          {candidates.map(c => <CandidateRow key={c.id} candidate={c} />)}
+          {filteredCandidates.map(c => <CandidateRow key={c.id} candidate={c} />)}
         </div>
       )}
     </div>

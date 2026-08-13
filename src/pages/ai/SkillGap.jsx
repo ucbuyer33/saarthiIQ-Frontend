@@ -1,43 +1,56 @@
-import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { TrendingUp, CheckCircle2, XCircle, Lightbulb, Search, FileText } from 'lucide-react'
-import { aiAPI } from '@/lib/api'
-import PageHeader from '@/components/ui/PageHeader'
-import Spinner from '@/components/ui/Spinner'
-import toast from 'react-hot-toast'
-import styles from './AIPages.module.css'
+// src/pages/ai/SkillGap.jsx
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import {
+  TrendingUp,
+  CheckCircle2,
+  XCircle,
+  Lightbulb,
+  Search,
+  Brain,
+  Sparkles,
+  FileText,
+} from 'lucide-react';
+import { aiAPI } from '@/lib/api';
+import PageHeader from '@/components/ui/PageHeader';
+import Spinner from '@/components/ui/Spinner';
+import toast from 'react-hot-toast';
+import styles from './AIPages.module.css';
 
 export default function SkillGap() {
-  const [params] = useSearchParams()
-  const [candidateId, setCandidateId] = useState(params.get('candidate') || '')
-  const [result, setResult] = useState(null)
-  const [aiReport, setAiReport] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [params] = useSearchParams();
+  const [candidateId, setCandidateId] = useState(params.get('candidate') || '');
+  const [gapResult, setGapResult] = useState(null);
+  const [reportResult, setReportResult] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const analyze = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setResult(null)
-    setAiReport(null)
+    e.preventDefault();
+    setLoading(true);
+    setGapResult(null);
+    setReportResult(null);
+
     try {
+      // Call both Skill Gap and AI Report APIs
       const [gapRes, reportRes] = await Promise.all([
         aiAPI.skillGap(candidateId),
         aiAPI.aiReport(candidateId),
-      ])
-      setResult(gapRes.data)
-      setAiReport(reportRes.data)
+      ]);
+
+      setGapResult(gapRes.data);
+      setReportResult(reportRes.data);
     } catch {
-      toast.error('Analysis failed')
+      toast.error('Analysis failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className={styles.page}>
       <PageHeader
         title="Skill Gap & AI Report"
-        subtitle="AI-powered skills analysis and detailed report for a candidate"
+        subtitle="Analyze skills and generate AI hiring recommendation from a single Candidate ID"
         icon={TrendingUp}
         iconColor="linear-gradient(135deg,#0891b2,#0e7490)"
       />
@@ -69,16 +82,16 @@ export default function SkillGap() {
       {loading && (
         <div className={styles.loadingState}>
           <Spinner size={24} />
-          <p>Running AI analysis…</p>
+          <p>Running AI skill and report analysis…</p>
         </div>
       )}
 
-      {!loading && (result || aiReport) && (
+      {!loading && (gapResult || reportResult) && (
         <div className={styles.resultsGrid}>
-          {/* Skill Gap section */}
-          {result && (
+          {/* Skill Gap Analysis */}
+          {gapResult && (
             <div className={styles.results}>
-              {result.matched_skills?.length > 0 && (
+              {gapResult.matched_skills?.length > 0 && (
                 <div className={styles.resultSection}>
                   <div className={styles.resultSectionHeader}>
                     <CheckCircle2
@@ -87,11 +100,11 @@ export default function SkillGap() {
                     />
                     <span>Matched Skills</span>
                     <span className={styles.resultCount}>
-                      {result.matched_skills.length}
+                      {gapResult.matched_skills.length}
                     </span>
                   </div>
                   <div className={styles.chipGrid}>
-                    {result.matched_skills.map((s) => (
+                    {gapResult.matched_skills.map((s) => (
                       <span
                         key={s}
                         className={`${styles.chip} ${styles.chipSuccess}`}
@@ -103,7 +116,7 @@ export default function SkillGap() {
                 </div>
               )}
 
-              {result.missing_skills?.length > 0 && (
+              {gapResult.missing_skills?.length > 0 && (
                 <div className={styles.resultSection}>
                   <div className={styles.resultSectionHeader}>
                     <XCircle
@@ -112,11 +125,11 @@ export default function SkillGap() {
                     />
                     <span>Missing Skills</span>
                     <span className={styles.resultCount}>
-                      {result.missing_skills.length}
+                      {gapResult.missing_skills.length}
                     </span>
                   </div>
                   <div className={styles.chipGrid}>
-                    {result.missing_skills.map((s) => (
+                    {gapResult.missing_skills.map((s) => (
                       <span
                         key={s}
                         className={`${styles.chip} ${styles.chipError}`}
@@ -128,41 +141,47 @@ export default function SkillGap() {
                 </div>
               )}
 
-              {result.recommendation && (
+              {gapResult.recommendation && (
                 <div className={styles.recommendation}>
                   <Lightbulb
                     size={15}
                     style={{ color: '#d97706', flexShrink: 0 }}
                   />
-                  <p>{result.recommendation}</p>
+                  <p>{gapResult.recommendation}</p>
+                </div>
+              )}
+
+              {gapResult.learning_path?.length > 0 && (
+                <div className={styles.resultSection}>
+                  <div className={styles.resultSectionHeader}>
+                    <Sparkles size={15} style={{ color: '#2563eb' }} />
+                    <span>Suggested Learning Path</span>
+                  </div>
+                  <ul className={styles.learningList}>
+                    {gapResult.learning_path.map((step, idx) => (
+                      <li key={idx}>{step}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
           )}
 
-          {/* AI Report section */}
-          {aiReport && (
-            <div className={styles.results}>
-              <div className={styles.resultSection}>
-                <div className={styles.resultSectionHeader}>
-                  <FileText
-                    size={15}
-                    style={{ color: 'var(--color-primary)' }}
-                  />
-                  <span>AI Report</span>
-                </div>
+          {/* AI Report */}
+          {reportResult && (
+            <div className={styles.reportCard}>
+              <div className={styles.reportHeader}>
+                <Brain size={15} />
+                <span>AI Candidate Report</span>
               </div>
               <div className={styles.reportBody}>
-                {typeof aiReport === 'string' ? (
-                  <p>{aiReport}</p>
-                ) : (
-                  <pre>{JSON.stringify(aiReport, null, 2)}</pre>
-                )}
+                {reportResult.report ||
+                  JSON.stringify(reportResult, null, 2)}
               </div>
             </div>
           )}
         </div>
       )}
     </div>
-  )
+  );
 }

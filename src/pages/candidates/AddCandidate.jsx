@@ -1,8 +1,8 @@
 // src/pages/candidates/AddCandidate.jsx
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Tag, CheckCircle2, UserPlus } from 'lucide-react'
-import { candidatesAPI } from '@/lib/api'
+import { ArrowLeft, User, Mail, Phone, MapPin, Briefcase, Tag, CheckCircle2, UserPlus, FileText } from 'lucide-react'
+import { candidatesAPI, resumeAPI } from '@/lib/api'
 import PageHeader from '@/components/ui/PageHeader'
 import Spinner from '@/components/ui/Spinner'
 import toast from 'react-hot-toast'
@@ -39,6 +39,7 @@ export default function AddCandidate() {
   const navigate  = useNavigate()
   const isEdit    = !!id
   const [form, setForm]         = useState(BLANK)
+  const [resumeFile, setResumeFile] = useState(null)
   const [loading, setLoading]   = useState(false)
   const [fetching, setFetching] = useState(isEdit)
 
@@ -69,8 +70,17 @@ export default function AddCandidate() {
         navigate(`/candidates/${id}`)
       } else {
         const res = await candidatesAPI.create(payload)
-        toast.success('Candidate added!')
-        navigate(`/candidates/${res.data.id}`)
+        const newId = res.data.id
+
+        // Upload resume immediately after candidate creation if file provided
+        if (resumeFile) {
+          const formData = new FormData()
+          formData.append('file', resumeFile)
+          await resumeAPI.upload(newId, formData)
+        }
+
+        toast.success(`Candidate added! ID: ${newId}`)
+        navigate(`/candidates/${newId}`)
       }
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Failed to save')
@@ -89,7 +99,7 @@ export default function AddCandidate() {
 
       <PageHeader
         title={isEdit ? 'Edit Candidate' : 'Add Candidate'}
-        subtitle={isEdit ? 'Update candidate information' : 'Fill in the details to add a new candidate to your pipeline'}
+        subtitle={isEdit ? 'Update candidate information' : 'Fill in the details to add a new candidate, upload resume, and generate AI insights'}
         icon={UserPlus}
         iconColor="linear-gradient(135deg,#6366f1,#4f46e5)"
         actions={
@@ -189,12 +199,31 @@ export default function AddCandidate() {
             </div>
           </div>
 
+          <div className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <FileText size={14} />
+              <span>Resume Upload</span>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Upload Resume (PDF)</label>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={e => setResumeFile(e.target.files?.[0] || null)}
+              />
+              <p className={styles.labelHint}>Optional, but required for Skill Gap and AI report analysis.</p>
+              {resumeFile && (
+                <p className={styles.selectedFile}>Selected: {resumeFile.name}</p>
+              )}
+            </div>
+          </div>
+
           <div className={styles.actions}>
             <button type="button" className={styles.cancelBtn} onClick={() => navigate('/candidates')}>Cancel</button>
             <button type="submit" className={styles.submitBtn} disabled={loading}>
               {loading
                 ? <><Spinner size={13} /> Saving…</>
-                : <><CheckCircle2 size={14} /> {isEdit ? 'Save Changes' : 'Add Candidate'}</>
+                : <><CheckCircle2 size={14} /> {isEdit ? 'Save Changes' : 'Add Candidate & Upload Resume'}</>
               }
             </button>
           </div>
