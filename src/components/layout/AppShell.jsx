@@ -1,11 +1,13 @@
 // src/components/layout/AppShell.jsx
 import { useEffect, useState, useCallback } from 'react'
-import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import styles from './AppShell.module.css'
 
-export default function AppShell() {
+// Layout shell that wraps the app and renders routed pages via `children`.
+// App.jsx wraps all <Routes> with <AppShell> so we intentionally do NOT
+// use React Router's <Outlet /> here.
+export default function AppShell({ children }) {
   const [collapsed, setCollapsed]   = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -60,7 +62,7 @@ export default function AppShell() {
       <div className={styles.main}>
         <Topbar onToggleSidebarMobile={toggleMobile} />
         <main className={styles.content}>
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>
