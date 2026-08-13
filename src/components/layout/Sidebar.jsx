@@ -1,102 +1,24 @@
-// src/components/layout/Sidebar.jsx
-import { NavLink } from 'react-router-dom'
-import BrandLogo from '@/components/BrandLogo';
-import {
-  LayoutDashboard, Users, FileText, TrendingUp, Brain,
-  Calendar, Megaphone, CheckSquare, BarChart2,
-  Shield, Settings,
-  PanelLeftClose, PanelLeftOpen,
-} from 'lucide-react'
-import { NAV_ITEMS } from '@/lib/constants'
-import styles from './Sidebar.module.css'
+import { NavLink } from "react-router-dom";
 
-const ICONS = {
-  LayoutDashboard, Users, FileText, TrendingUp, Brain,
-  Calendar, Megaphone, CheckSquare, BarChart2,
-  Shield, Settings,
-}
-
-const SECTION_ORDER = ['Main', 'Recruitment', 'Tools']
-
-function groupItems(items) {
-  const groups = {}
-  items.forEach(item => {
-    const sec = item.section || 'Main'
-    if (!groups[sec]) groups[sec] = []
-    groups[sec].push(item)
-  })
-  return SECTION_ORDER.filter(s => groups[s]).map(s => ({ label: s, items: groups[s] }))
-}
-
-export default function Sidebar({ collapsed, mobileOpen, onCollapse, onCloseMobile }) {
-  // Single-role (recruiter) app — every logged-in user sees every nav item.
-  const groups = groupItems(NAV_ITEMS)
-
-  const handleNavClick = () => {
-    if (window.innerWidth <= 768) onCloseMobile?.()
-  }
-
+function Sidebar() {
   return (
-    <aside
-      className={styles.sidebar}
-      data-collapsed={collapsed}
-      data-mobile-open={mobileOpen}
-      aria-label="Sidebar navigation"
-    >
-      <div className={styles.inner}>
-
-        {/* Brand */}
-        <button
-          className={styles.logo}
-          onClick={() => window.innerWidth > 768 && onCollapse?.()}
-          aria-label="Toggle sidebar"
-        >
-          <BrandLogo
-            collapsed={collapsed}
-            className={collapsed ? styles.logoImgMark : styles.logoImgFull}
-          />
-        </button>
-
-        {/* Nav */}
-        <nav className={styles.nav}>
-          {groups.map(group => (
-            <div key={group.label}>
-              {/* Hide label for 'Main' — no visual clutter for the top group */}
-              {!collapsed && group.label !== 'Main' && (
-                <p className={styles.navSection}>{group.label}</p>
-              )}
-              {group.items.map(item => {
-                const Icon = ICONS[item.icon]
-                return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={handleNavClick}
-                    className={({ isActive }) =>
-                      `${styles.navItem} ${isActive ? styles.active : ''}`
-                    }
-                    title={collapsed ? item.label : undefined}
-                  >
-                    {Icon && <Icon size={16} />}
-                    {!collapsed && <span>{item.label}</span>}
-                  </NavLink>
-                )
-              })}
-            </div>
-          ))}
-        </nav>
-
-        {/* Collapse toggle — desktop only */}
-        <button
-          className={styles.collapseBtn}
-          onClick={onCollapse}
-          aria-label="Toggle sidebar"
-        >
-          {collapsed
-            ? <PanelLeftOpen size={15} />
-            : <><PanelLeftClose size={15} /><span>Collapse</span></>}
-        </button>
-      </div>
+    <aside className="sidebar">
+      <nav>
+        <ul>
+          <li>
+            <NavLink to="/">Dashboard</NavLink>
+          </li>
+          <li>
+            <NavLink to="/candidates">Candidates</NavLink>
+          </li>
+          {/* Resumes removed from sidenav, now lives under candidates */}
+          <li>
+            <NavLink to="/interviews/skillgap">SkillGap & Interviews</NavLink>
+          </li>
+        </ul>
+      </nav>
     </aside>
-  )
+  );
 }
+
+export default Sidebar;
