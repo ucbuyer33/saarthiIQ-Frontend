@@ -18,7 +18,6 @@ import ResumeUpload from './pages/resume/ResumeUpload'
 import ResumeScore from './pages/resume/ResumeScore'
 import JobMatch from './pages/resume/JobMatch'
 import SkillGap from './pages/ai/SkillGap'
-import AIReport from './pages/ai/AIReport'
 import InterviewList from './pages/interviews/InterviewList'
 import ScheduleInterview from './pages/interviews/ScheduleInterview'
 import CampaignList from './pages/campaigns/CampaignList'
@@ -55,7 +54,6 @@ export default function App() {
           <Route path="/resume/score/:id"   element={<ResumeScore />} />
           <Route path="/resume/match/:id"   element={<JobMatch />} />
           <Route path="/ai/skill-gap"        element={<SkillGap />} />
-          <Route path="/ai/report"           element={<AIReport />} />
 
           <Route path="/interviews"           element={<InterviewList />} />
           <Route path="/interviews/schedule"  element={<ScheduleInterview />} />
