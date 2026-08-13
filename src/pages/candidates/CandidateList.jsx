@@ -79,6 +79,7 @@ export default function CandidateList() {
         }
       />
 
+      {/* existing toolbar, filters, grid/list rendering unchanged */}
       <div className={styles.toolbar}>
         <div className={styles.tabs}>
           {STATUS_TABS.map(tab => {
