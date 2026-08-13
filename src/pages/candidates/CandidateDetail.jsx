@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Edit, Trash2, FileText, Brain, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Edit, Trash2, FileText, TrendingUp } from 'lucide-react'
 import { candidatesAPI, resumeAPI, notesAPI } from '@/lib/api'
 import PageHeader from '@/components/ui/PageHeader'
 import Badge from '@/components/ui/Badge'
@@ -49,6 +49,15 @@ export default function CandidateDetail() {
     } catch { toast.error('Failed to add note') }
   }
 
+  const handleViewResumeScore = () => {
+    navigate(`/resume/score/${id}`)
+  }
+
+  const handleAnalyzeSkillGapAndReport = () => {
+    // Link candidate properly to Skill Gap page using candidate ID
+    navigate(`/ai/skill-gap?candidate=${id}`)
+  }
+
   if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-16)' }}><Spinner size={32} /></div>
   if (!candidate) return <p>Candidate not found.</p>
 
@@ -93,9 +102,8 @@ export default function CandidateDetail() {
           <div className="card">
             <h3 className="section-title">AI Actions</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              <button className="btn btn-secondary" onClick={() => navigate(`/resume/score/${id}`)}><FileText size={14} /> View Resume Score</button>
-              <button className="btn btn-secondary" onClick={() => navigate(`/ai/skill-gap?candidate=${id}`)}><TrendingUp size={14} /> Skill Gap Analysis</button>
-              <button className="btn btn-secondary" onClick={() => navigate(`/ai/report?candidate=${id}`)}><Brain size={14} /> Generate AI Report</button>
+              <button className="btn btn-secondary" onClick={handleViewResumeScore}><FileText size={14} /> View Resume Score</button>
+              <button className="btn btn-secondary" onClick={handleAnalyzeSkillGapAndReport}><TrendingUp size={14} /> Skill Gap + AI Report</button>
             </div>
           </div>
         </div>
